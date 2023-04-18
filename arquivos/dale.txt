@@ -1,0 +1,7 @@
+<AF>
+<estados>
+1 2 3 4 5
+<transicoes>
+1 2 a
+2 3 b
+4 5 c
