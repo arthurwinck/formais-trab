@@ -1,0 +1,12 @@
+<GR>
+<terminais>
+a b c
+<nao_terminais>
+S A B C
+<simbolo_inicial>
+S
+<producoes>
+s->aA
+A->bB
+B->cC
+C->c

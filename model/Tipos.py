@@ -25,3 +25,13 @@ class Elemento():
 
     def getTipo(self) -> TipoArquivo:
         return self.tipo
+
+class Transicao():
+    def __init__(self, origem=None, destino=None, simbolos=None) -> None:
+        self.origem = origem
+        self.destino = destino
+        if simbolos is None:
+            self.simbolos = []
+
+    def printar(self):
+        print(f"{self.origem} -({','.join(self.simbolos)})-> {self.destino}")

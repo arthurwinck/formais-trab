@@ -1,5 +1,10 @@
-from model.Tipos import TipoArquivo, Elemento
-from model import GramaticaRegular, AutomatoFinito, AutomatoPilha, GramaticaLC, ExpressaoRegular
+from model.Tipos import Elemento, TipoArquivo
+from model.GramaticaLC import GramaticaLC
+from model.GramaticaRegular import GramaticaRegular
+from model.AutomatoFinito import AutomatoFinito
+from model.ExpressaoRegular import ExpressaoRegular
+from model.AutomatoPilha import AutomatoPilha
+
 
 class Leitor:
     def __init__(self, arquivo: str):
@@ -9,10 +14,12 @@ class Leitor:
         arquivo = open(self.arquivo)
         texto = arquivo.read().split("\n")
         tipo = self.pegarTipo(texto)
-        automato = self.criarElemento(tipo, texto)
-        
+        elemento = self.criarElemento(tipo, texto)
+
+        return elemento
+
     def pegarTipo(self, texto) -> TipoArquivo:
-        TipoArquivo.convertTipo(texto)
+        return TipoArquivo.convertTipo(texto)
 
     def criarElemento(self, tipo: TipoArquivo, texto: str) -> Elemento:
         if tipo == TipoArquivo.AF or tipo == TipoArquivo.AFP:
@@ -21,6 +28,8 @@ class Leitor:
             return self.criarGramatica(tipo, texto)
         elif tipo == TipoArquivo.ER:
             return self.criarExpressao(tipo, texto)
+        else:
+            raise Exception("Esse elemento não é de nenhum tipo")
 
     def criarAutomato(self, tipo: TipoArquivo, texto: str) -> Elemento:
         estados = self.pegarEstados(texto)
@@ -32,9 +41,13 @@ class Leitor:
         automato = None
 
         if tipo == TipoArquivo.AF:
-            automato = AutomatoFinito(estados, alfabeto, transicoes, estado_inicial, estados_aceitacao)           
+            automato = AutomatoFinito(
+                estados, alfabeto, transicoes,
+                estado_inicial, estados_aceitacao)
         elif tipo == TipoArquivo.AFP:
-            automato = AutomatoPilha(estados, alfabeto, transicoes, estado_inicial, estados_aceitacao)
+            automato = AutomatoPilha(
+                estados, alfabeto, transicoes, 
+                estado_inicial, estados_aceitacao)
 
         return automato
 
@@ -47,9 +60,11 @@ class Leitor:
         gramatica = None
 
         if (tipo == TipoArquivo.GR):
-            gramatica = GramaticaRegular(nao_terminais, terminais, producoes, simbolo_inicial)
+            gramatica = GramaticaRegular(
+                nao_terminais, terminais, producoes, simbolo_inicial)
         elif (tipo == TipoArquivo.GLC):
-            gramatica = GramaticaLC(nao_terminais, terminais, producoes, simbolo_inicial)
+            gramatica = GramaticaLC(
+                nao_terminais, terminais, producoes, simbolo_inicial)
 
         return gramatica
 
@@ -57,7 +72,7 @@ class Leitor:
         alfabeto = self.pegarAlfabeto(texto)
         expressao = self.pegarExpressao(texto)
 
-        expressaoRegular = ExpressaoRegular(alfabeto,expressao)
+        expressaoRegular = ExpressaoRegular(alfabeto, expressao)
 
         return expressaoRegular
 
@@ -69,7 +84,7 @@ class Leitor:
         indice = texto.index('<estado_inicial>')
         return texto[indice+1].split()
 
-    def pegarEstadoAceitacao(self, texto):
+    def pegarEstadosAceitacao(self, texto):
         indice = texto.index('<estados_aceitacao>')
         return texto[indice+1].split()
 
@@ -79,12 +94,12 @@ class Leitor:
 
     def pegarTransicoes(self, texto):
         indice = texto.index('<transicoes>')
-        return texto[indice+1:].split()
+        return texto[indice+1:]
 
     # Gramáticas
 
     def pegarNaoTerminais(self, texto):
-        indice = texto.index('*<nao_terminais>')
+        indice = texto.index('<nao_terminais>')
         return texto[indice+1].split()
 
     def pegarTerminais(self, texto):
@@ -99,14 +114,21 @@ class Leitor:
     def pegarProducoes(self, texto):
         indice = texto.index('<producoes>')
         return texto[indice+1:-1]
-    
+
     # Expressões Regulares
 
     def pegarExpressao(self, texto):
         indice = texto.index('<expressao>')
         return texto[indice+1]
+
+
+if __name__ == "__main__":
+
+    leitorAF = Leitor("./arquivos/af.txt")
+    leitorAFP = Leitor("./arquivos/afp.txt")
+    af = leitorAF.ler()
+    afp = leitorAFP.ler()
+    af.printar()
+    afp.printar()
+
     
-
-
-leitor = Leitor(".arquivos/dale.txt")
-leitor.ler()

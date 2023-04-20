@@ -1,4 +1,4 @@
-from Tipos import TipoArquivo, Elemento
+from .Tipos import TipoArquivo, Elemento
 
 class GramaticaRegular(Elemento):
     def __init__(self, nao_terminais, terminais, producoes, simbolo_inicial) -> None:

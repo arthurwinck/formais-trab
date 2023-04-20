@@ -1,10 +1,6 @@
-from Tipos import TipoArquivo, Elemento
+from .Tipos import TipoArquivo
+from .Automato import Automato
 
-class AutomatoFinito(Elemento):
-    def __init__(self, estados, alfabeto, transicoes, estado_inicial, estados_aceitacao) -> None:
-        super().__init__(TipoArquivo.AF)
-        self.estados = estados
-        self.alfabeto = alfabeto
-        self.transicoes = transicoes
-        self.estado_inicial = estado_inicial
-        self.estados_aceitacao = estados_aceitacao
+class AutomatoFinito(Automato):
+    def __init__(self, estados=None, alfabeto=None, transicoes=None, estado_inicial=None, estados_aceitacao=None) -> None:
+        super().__init__(TipoArquivo.AF, estados, alfabeto, transicoes, estado_inicial, estados_aceitacao)

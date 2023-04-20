@@ -1,11 +1,14 @@
-<AF>
+<AFP>
 <estados>
 1 2 3 4 5
 <estado_inicial>
 1
-<estado_final>
+<estados_aceitacao>
 5
+<alfabeto>
+a b c
 <transicoes>
 1 2 a
+2 4 a,b
 2 3 b
 4 5 c

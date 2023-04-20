@@ -1,4 +1,5 @@
-from Tipos import TipoArquivo, Elemento
+from .Tipos import TipoArquivo, Elemento
+
 
 class ExpressaoRegular(Elemento):
     def __init__(self) -> None:

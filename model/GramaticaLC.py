@@ -1,4 +1,5 @@
-from Tipos import TipoArquivo, Elemento
+from .Tipos import TipoArquivo, Elemento
+
 
 class GramaticaLC(Elemento):
     def __init__(self, nao_terminais, terminais, producoes, simbolo_inicial) -> None:
