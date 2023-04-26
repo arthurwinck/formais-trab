@@ -37,7 +37,6 @@ class Leitor:
         transicoes = self.pegarTransicoes(texto)
         estado_inicial = self.pegarEstadoInicial(texto)
         estados_aceitacao = self.pegarEstadosAceitacao(texto)
-
         automato = None
 
         if tipo == TipoArquivo.AF:
@@ -126,9 +125,10 @@ if __name__ == "__main__":
 
     leitorAF = Leitor("./arquivos/af.txt")
     leitorAFP = Leitor("./arquivos/afp.txt")
+    leitorAFND = Leitor("./arquivos/afnd.txt")
     af = leitorAF.ler()
     afp = leitorAFP.ler()
+    afnd = leitorAFND.ler()
     af.printar()
     afp.printar()
-
-    
+    afnd.calcularEFecho()
