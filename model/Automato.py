@@ -16,7 +16,7 @@ class Automato(Elemento):
         return self.estados.index(simbolo)
 
     def getElement(self, index: int) -> str:
-        return self.estados[int]
+        return self.estados[index]
 
     # Transforma string de simbolos "a,b,c" em lista 
     def unpackSimbolos(self, simbolos: str) -> list:
@@ -24,7 +24,13 @@ class Automato(Elemento):
 
     # Transforma lista de símbolos [a,b,c] em string
     def packSimbolos(self, simbolos: list) -> str:
-        return ",".join(simbolos)
+        if simbolos != None:
+            if len(simbolos) != 0:
+                simbolosSorted = simbolos.copy()
+                simbolosSorted.sort()
+            return ",".join(simbolosSorted)
+        else:
+            return ""
 
     def printarTransicoes(self):
         for i in range(len(self.transicoes)):
@@ -34,7 +40,7 @@ class Automato(Elemento):
 
     # Realizamos um mapeamento usando a lista de estados ordenada para criar 
     # a matriz de transições -> origemXdestino onde o elemento i[origem][destino]
-    # é igual aos simbólos por qual a transição origem->destino acontecem 
+    # é igual aos simbolos por qual a transição origem->destino acontecem 
     def criarTransicoes(self, listaTransicoes: list) -> None:
         for transicao in listaTransicoes:
             listaTransicao = transicao.split(" ")
@@ -65,3 +71,25 @@ class Automato(Elemento):
         print("Transições:")
         self.printarTransicoes()
         print("------------------------------------")
+
+    def printDebug(self) -> None:
+        print("--------------- [DEBUG] - AUTOMATO ---------------")
+        print(f"Estados: {self.estados}")
+        print(f"Alfabeto: {self.alfabeto}")
+        print(f"Tamanho da lista de estados: {len(self.estados)}")
+        print(f"Tamanho da lista de lista de transições: {len(self.transicoes)}")
+        print(f"Tamanho da lista de transições de cada elemento:")
+        try:
+            for i in range(len(self.estados)):
+                print(f"    Estado {self.getElement(i)}: {len(self.transicoes[i])}")
+        except IndexError:
+            print("Erro ao tentar printar - a lista de estados e a lista de transições possuem valores diferentes")
+
+        # try:
+        #     for i in range(len(self.estados)):
+        #         print(f"    Lista de transições de {self.getElement(i)} ---")
+        #         for j in range(len(self.estados)):
+        #             print(f"        {self.estados[i]} -> {self.estados[j]} por {self.transicoes[i][j]}")
+        # except IndexError:
+        #     print("Index erro ao tentar printar transições - lista de estados e lista de transições possuem tamanhos diferentes")
+        print("--------------- [DEBUG] - AUTOMATO ---------------")

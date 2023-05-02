@@ -131,4 +131,4 @@ if __name__ == "__main__":
     afnd = leitorAFND.ler()
     af.printar()
     afp.printar()
-    afnd.calcularEFecho()
+    afnd.determinizar()
