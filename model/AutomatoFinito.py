@@ -24,43 +24,107 @@ class AutomatoFinito(Automato):
                 novoEstadoEF.sort()
                 
                 self.calcularNovasTransicoes(novoEstadoEF, refEstados)
-                self.removerTransicoesEF()
+                self.removerTransicoes('&')
                 self.printDebug()
+
+        # Calcular novos estados e transições a partir de transições replicadas (mesmo estado origem e mesmo símbolo)
+        self.calcularTransicoesADeterminizar()
+        print("Automato determinizado")
+        self.printar()
+
+    # Obter todos os estados destinos tendo um símbolo de transição e um estado origem
+    def getEstadosDestinosPorSimbolo(self, estadoOrigem: str, simbolo: str) -> list:
+        return [i for i, simboloTransicao in enumerate(self.transicoes[self.getPos(estadoOrigem)]) if simboloTransicao == simbolo]
+
+    # Buscar todas as transições pelo mesmo símbolo e estado de origem, a ponto de determinizá-las
+    def calcularTransicoesADeterminizar(self) -> None:
+        dictTransicoesPorMesmoSimbolo = self.findTransicoesPorMesmoSimbolo()
+        print(f"Transicoes por mesmo símbolo: {dictTransicoesPorMesmoSimbolo}")
+
+        # Passo por todos símbolos de cada dicionário. Para cada tupla de símbolo e estado, obter o novo estado determinizado
+        for key in dictTransicoesPorMesmoSimbolo:
+            for simbolo in dictTransicoesPorMesmoSimbolo[key]:
+                estadosDestinoPorSimbolo = self.getEstadosDestinosPorSimbolo(key, simbolo)
+                self.calcularNovasTransicoesDet(key, estadosDestinoPorSimbolo, simbolo)
+
+    # Função principal para criar novas transições determinizadas (usa calcularNovasTransicoes)
+    def calcularNovasTransicoesDet(self, estadoOrigem: str, estadoDestinoPorSimbolo: list, simbolo: str):
+        
+        # Converter lista númerica de estados em uma lista de strings
+        if len(estadoDestinoPorSimbolo) != 0:
+            if isinstance(estadoDestinoPorSimbolo[0], int):
+                estadoDestinoPorSimbolo = list(map(self.getElement, estadoDestinoPorSimbolo))
             
-        listaNovasTransicoes = self.obterNovasTransicoes()
+            estadoDestinoPorSimboloStr = self.packSimbolos(estadoDestinoPorSimbolo)
+            
+            if self.packSimbolos(estadoDestinoPorSimbolo) in self.estados:
+                self.calcularNovasTransicoes(estadoDestinoPorSimbolo, self.estados)       
+            
+            simbolosTransicao = self.transicoes[self.getPos(estadoOrigem)][self.getPos(estadoDestinoPorSimboloStr)]
+            listaSimbolosTransicao = self.unpackSimbolos(simbolosTransicao)
 
-    # def obterNovasTransicoes(self) -> list:
-    #     # Passar por cada lista de transição de estado desempacotando os símbolos e
-    #     # checando se existe alguma replicação. Se for verdade, adicionar a linha e coluna
-    #     # e o elemento para ser retornado
-    #     listaSimbolos = []
+            print(f"listaSimbolosTransicao: {listaSimbolosTransicao}")
+            
+            self.removeTransicoesDeterminizadas(estadoOrigem, estadoDestinoPorSimbolo, simbolo)
 
-    #     # Cada iteração do loop de fora é uma iteração sobre uma lista de transições de um símbolo
-    #     for i in range(len(self.estados)):
-    #         setSimbolosEstado = set()
+            if listaSimbolosTransicao == ['']:
+                self.transicoes[self.getPos(estadoOrigem)][self.getPos(estadoDestinoPorSimboloStr)] = simbolo
+            elif simbolo not in self.unpackSimbolos(listaSimbolosTransicao):
+                self.transicoes[self.getPos(estadoOrigem)][self.getPos(estadoDestinoPorSimboloStr)] = self.packSimbolos(listaSimbolosTransicao.append(simbolo))                
+            
+            print(f"Símbolo: {self.transicoes[self.getPos(estadoOrigem)][self.getPos(estadoDestinoPorSimboloStr)]} | estado origem: {estadoOrigem} | estado destino {self.getPos(estadoDestinoPorSimboloStr)}")
 
-    #         for j in range(len(self.estados)):
-    #             listaSimbolosTemp = list(filter(lambda x: x != '', self.unpackSimbolos(self.transicoes[i][j])))
-                
-    #             # Jeito mais elegante para checar replicações na lista
-    #             if len(listaSimbolosTemp) > 0:
-    #                 tam = len(setSimbolosEstado)
-    #                 setSimbolosEstado.update(listaSimbolosTemp)
-    #                 novoTam = len(setSimbolosEstado)
+    # Buscar todas transições por mesmo símbolo
+    def findTransicoesPorMesmoSimbolo(self) -> dict:
+        dicEstadoTransicoes = {}
+        
+        for i in range(len(self.estados)):
+            simboloIgualSet = set()
+            simbolosNovaTransicao = []
+            
+            for j in range(len(self.estados)):
 
-    #                 if tam == novoTam:
+                if self.transicoes[i][j] != '':
+                    simbolos = self.unpackSimbolos(self.transicoes[i][j])
+                    
+                    for simbolo in simbolos:
+                        tam = len(simboloIgualSet)
+                        simboloIgualSet.add(simbolo)
 
+                        if tam == len(simboloIgualSet):
+                            simbolosNovaTransicao.append(simbolo)
+            
+            # dicEstadosTransicoes[estadoOrigem] = simbolosNovaTransicao
+            dicEstadoTransicoes[self.getElement(i)] = simbolosNovaTransicao
 
+        return dicEstadoTransicoes
 
-    def removerTransicoesEF(self):
+    # Remover as transições que foram determinizadas
+    def removeTransicoesDeterminizadas(self, estadoOrigem: str, listEstadosDeterminizados: list, simbolo: str) -> None:
+        for i in range(len(self.estados)):
+            if simbolo in self.transicoes[self.getPos(estadoOrigem)][i]:
+                novaTransicao = self.unpackSimbolos(self.transicoes[self.getPos(estadoOrigem)][i]).remove(simbolo)
+
+                if novaTransicao == None:
+                    novaTransicao = ''
+
+                self.transicoes[self.getPos(estadoOrigem)][i] = novaTransicao
+
+    # Remover transições por símbolo (usado com '&')
+    def removerTransicoes(self, simbolo: str) -> None:
         for i in range(len(self.estados)):
             for j in range(len(self.estados)):
-                if '&' in self.transicoes[i][j]:
-                    novaTransicao = self.unpackSimbolos(self.transicoes[i][j]).remove('&')
+                if simbolo in self.transicoes[i][j]:
+                    novaTransicao = self.unpackSimbolos(self.transicoes[i][j]).remove(simbolo)
                     self.transicoes[i][j] = self.packSimbolos(novaTransicao)
 
+    # Método recursivo para criação de novos estados e suas transições
     def calcularNovasTransicoes(self, novoEstadoEF: list, refEstados: list) -> None:
         listaNovosEstadosOriginados = []
+
+        if isinstance(novoEstadoEF[0], int):
+            novoEstadoEF = list(map(self.getElement, (novoEstadoEF)))
+
         novoEstadoEFString = self.packSimbolos(novoEstadoEF)
         
         if novoEstadoEFString not in refEstados:
@@ -98,8 +162,8 @@ class AutomatoFinito(Automato):
                         
             for estado in listaNovosEstadosOriginados:
                 self.calcularNovasTransicoes(estado, refEstados)
-        
-        
+
+    # Adicionar um estado vazio
     def addEstado(self, novoEstado: str) -> None:
         for i in range(len(self.estados)):
             self.transicoes[i].append('')
@@ -109,7 +173,6 @@ class AutomatoFinito(Automato):
             self.estados.append(novoEstado)
         else:
             self.estados.append(novoEstado)
-        self.printDebug()
 
     # Calcular novas transições e adicionar novos estados caso não existam  
     def calcularTransicoes(self, novoEstadoEF: list) -> None:
@@ -127,8 +190,7 @@ class AutomatoFinito(Automato):
 
         novosEstados.append(listaNovoEstado)
 
-    # Sigma Fecho de um estado é o próprio estado + todos os estados 
-    # que eu alcanço de um modo recursivo a partir de transições & 
+    # Sigma Fecho de um estado é o próprio estado + todos os estados que eu alcanço de um modo recursivo a partir de transições & 
     def checkFor(self, simbol: str) -> bool:
         for i in range(len(self.estados)):
             for j in range(len(self.estados)):
@@ -137,6 +199,7 @@ class AutomatoFinito(Automato):
 
         return False
     
+    # Calcular conjunto de estado & fecho para cada estado
     def calcularEFecho(self) -> dict:
         dicEstadosEFecho = {}
         for estado in self.estados:
@@ -151,13 +214,22 @@ class AutomatoFinito(Automato):
             return True
         return False
 
+    # Função recursiva para buscar todos os possíveis estados realizando as transições por &
     def findETransicao(self, estado: str, setEstadosEFecho: set) -> set:
+        estadosProcurados = []
+        
+        return self.findETransicaoRec(estado, setEstadosEFecho, estadosProcurados)
+
+    def findETransicaoRec(self, estado: str, setEstadosEFecho: set, estadosProcurados: list) -> set:
         for i in range(len(self.estados)):
             for j in range(len(self.estados)):
                 if '&' in self.transicoes[i][j] and self.estados[i] == estado:
                     # Adiciono o estado destino pois fará parte do conjunto sigma fecho desse estado
                     setEstadosEFecho.add(self.estados[j])
                     # Parte da função recursiva que irá testar novamente todas as transições pro novo estado capturado
-                    setEstadosEFecho.union(self.findETransicao(self.estados[j], setEstadosEFecho))
+                    if self.estados[j] not in estadosProcurados:
+                        estadosProcurados.append(self.estados[j])
+                        setEstadosEFecho.union(self.findETransicaoRec(self.estados[j], setEstadosEFecho, estadosProcurados))
 
         return setEstadosEFecho
+        
