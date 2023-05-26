@@ -123,13 +123,14 @@ class Leitor:
 
 if __name__ == "__main__":
 
-    leitorAF = Leitor("./arquivos/af.txt")
-    leitorAFP = Leitor("./arquivos/afp.txt")
-    leitorAFND = Leitor("./arquivos/afnd2.txt")
-    af = leitorAF.ler()
-    afp = leitorAFP.ler()
+    #leitorAF = Leitor("./arquivos/af.txt")
+    #leitorAFP = Leitor("./arquivos/afp.txt")
+    leitorAFND = Leitor("./arquivos/afnd_moodle_1.txt")
+    #af = leitorAF.ler()
+    #afp = leitorAFP.ler()
     afnd = leitorAFND.ler()
-    af.printar()
-    afp.printar()
+    #af.printar()
+    #afp.printar()
     afnd.determinizar()
     afnd.printar()
+    #afnd.printarTabela()

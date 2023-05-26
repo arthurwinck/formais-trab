@@ -93,3 +93,20 @@ class Automato(Elemento):
         # except IndexError:
         #     print("Index erro ao tentar printar transições - lista de estados e lista de transições possuem tamanhos diferentes")
         print("--------------- [DEBUG] - AUTOMATO ---------------")
+
+    def printTransitions(self) -> None:
+        # Calculate the maximum width of each column
+        column_widths = [max(len(estado), max(len(str(transicoes)) for transicoes in self.transicoes[i])) for i, estado in enumerate(self.estados)]
+
+        # Print the header row with state labels and dividers
+        header_row = "     " + " | ".join(f"[{estado.center(width)}]" for estado, width in zip(self.estados, column_widths))
+        divider_row = "-----+" + "+".join("-" * width for width in column_widths)
+        print(header_row)
+        print(divider_row)
+
+        # Print each row of the transition matrix with dividers
+        for i, row in enumerate(self.transicoes):
+            estado_label = self.estados[i]
+            transicoes = " | ".join(str(transicoes).center(width) if transicoes else "" for transicoes, width in zip(row, column_widths))
+            row_str = f"[{estado_label}] | {transicoes}"
+            print(row_str)

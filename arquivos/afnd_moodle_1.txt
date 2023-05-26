@@ -1,0 +1,19 @@
+<AF>
+<estados>
+p q r s
+<estado_inicial>
+p
+<estados_aceitacao>
+q s
+<alfabeto>
+0 1
+<transicoes>
+p q 0
+p s 0
+p q 1
+q r 0
+q q 1
+q r 1
+r s 0
+r p 1
+s p 1

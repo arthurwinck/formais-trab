@@ -12,6 +12,7 @@ class AutomatoFinito(Automato):
         refEstados = self.estados.copy()
         novasTransicoes = None
 
+        #self.printar()
         # Checar se existem transições por E fecho
         if self.checkFor('&'):
             # Dicionario que para cada estado do automato atual temos uma lista de estados e-fecho
@@ -25,12 +26,11 @@ class AutomatoFinito(Automato):
                 
                 self.calcularNovasTransicoes(novoEstadoEF, refEstados)
                 self.removerTransicoes('&')
-                self.printDebug()
+                #self.printDebug()
 
         # Calcular novos estados e transições a partir de transições replicadas (mesmo estado origem e mesmo símbolo)
         self.calcularTransicoesADeterminizar()
         print("Automato determinizado")
-        self.printar()
 
     # Obter todos os estados destinos tendo um símbolo de transição e um estado origem
     def getEstadosDestinosPorSimbolo(self, estadoOrigem: str, simbolo: str) -> list:
@@ -49,18 +49,21 @@ class AutomatoFinito(Automato):
 
     # Função principal para criar novas transições determinizadas (usa calcularNovasTransicoes)
     def calcularNovasTransicoesDet(self, estadoOrigem: str, estadoDestinoPorSimbolo: list, simbolo: str):
-        
+        print(f"estadoOrigem: {estadoOrigem}, estadoDestinoPorSimbolo: {list(map(self.getElement, estadoDestinoPorSimbolo))}, simbolo: {simbolo}")
+
         # Converter lista númerica de estados em uma lista de strings
         if len(estadoDestinoPorSimbolo) != 0:
             if isinstance(estadoDestinoPorSimbolo[0], int):
                 estadoDestinoPorSimbolo = list(map(self.getElement, estadoDestinoPorSimbolo))
             
+            # Novo estado que agrupa estados originais
             estadoDestinoPorSimboloStr = self.packSimbolos(estadoDestinoPorSimbolo)
             
-            if self.packSimbolos(estadoDestinoPorSimbolo) in self.estados:
-                self.calcularNovasTransicoes(estadoDestinoPorSimbolo, self.estados)       
+            #if estadoDestinoPorSimboloStr in self.estados:
+            self.calcularNovasTransicoes(estadoDestinoPorSimbolo, self.estados)
             
             simbolosTransicao = self.transicoes[self.getPos(estadoOrigem)][self.getPos(estadoDestinoPorSimboloStr)]
+            
             listaSimbolosTransicao = self.unpackSimbolos(simbolosTransicao)
 
             print(f"listaSimbolosTransicao: {listaSimbolosTransicao}")
@@ -69,7 +72,7 @@ class AutomatoFinito(Automato):
 
             if listaSimbolosTransicao == ['']:
                 self.transicoes[self.getPos(estadoOrigem)][self.getPos(estadoDestinoPorSimboloStr)] = simbolo
-            elif simbolo not in self.unpackSimbolos(listaSimbolosTransicao):
+            elif simbolo not in listaSimbolosTransicao:
                 self.transicoes[self.getPos(estadoOrigem)][self.getPos(estadoDestinoPorSimboloStr)] = self.packSimbolos(listaSimbolosTransicao.append(simbolo))                
             
             print(f"Símbolo: {self.transicoes[self.getPos(estadoOrigem)][self.getPos(estadoDestinoPorSimboloStr)]} | estado origem: {estadoOrigem} | estado destino {self.getPos(estadoDestinoPorSimboloStr)}")
@@ -127,42 +130,48 @@ class AutomatoFinito(Automato):
 
         novoEstadoEFString = self.packSimbolos(novoEstadoEF)
         
+        #print(f"[]Executando calcularNovasTransicoes para: {novoEstadoEFString}")
+        self.log("calcularNovasTransicoes", f"Executando pra {novoEstadoEFString}")
+
         if novoEstadoEFString not in refEstados:
             if novoEstadoEFString not in self.estados:
                 self.addEstado(novoEstadoEFString)
 
-            for simbolo in self.alfabeto:
-                #Para cada símbolo, teremos um novo estado destino
-                novoEstadoOriginado = []
+        for simbolo in self.alfabeto:
+            #Para cada símbolo, teremos um novo estado destino
+            novoEstadoOriginado = set()
+        
+            # iterar sobre as transições dos estados que estão lista procurando por transições com esse símbolo.
+            # se essa transição existir, o estado irá para um conjunto do novo estado
+            for i in range(len(self.estados)):
+                for j in range(len(self.estados)):
+                    # Existe uma transição por esse símbolo e que o estado origem dessa transição está presente no conjunto do novoEstadoEF
+                    if simbolo in self.transicoes[i][j] and self.getElement(i) in novoEstadoEF:
+                        self.printTransitions()
+                        self.log("calcularNovasTransicoes", f"Simbolo {simbolo} existe na transição {self.transicoes[i][j]} do estado origem {self.estados[i]}, dentro de {novoEstadoEF} para {self.estados[j]}")
+                        novoEstadoOriginado.add(self.estados[j])
             
-                # iterar sobre as transições dos estados que estão lista procurando por transições com esse símbolo.
-                # se essa transição existir, o estado irá para um conjunto do novo estado
-                for i in range(len(self.estados)):
-                    for j in range(len(self.estados)):
-                        # Existe uma transição por esse símbolo e que o estado origem dessa transição está presente no conjunto do novoEstadoEF
-                        if simbolo in self.transicoes[i][j] and self.getElement(i) in novoEstadoEF:
-                            novoEstadoOriginado.append(self.estados[j])
-                
-                # Se eu consegui gerar um novo estado não vazio, preciso adicionar esse novo estado a lista de estados e também gerar as suas transições
-                # Além de atualizar as transições do novoEstadoEF que tem esse novo estado como destino 
-                if len(novoEstadoOriginado) != 0:
-                    estadoOriginadoString = self.packSimbolos(novoEstadoOriginado)
-                
-                    if estadoOriginadoString not in self.estados: 
-                        self.addEstado(estadoOriginadoString)
-                        listaNovosEstadosOriginados.append(novoEstadoOriginado)
+            # Se eu consegui gerar um novo estado não vazio, preciso adicionar esse novo estado a lista de estados e também gerar as suas transições
+            # Além de atualizar as transições do novoEstadoEF que tem esse novo estado como destino 
+            if len(novoEstadoOriginado) != 0:
+                estadoOriginadoString = self.packSimbolos(list(novoEstadoOriginado))
+            
+                if estadoOriginadoString not in self.estados:
+                    self.log("calculaNovasTransicoes", f"Adicionando estado {estadoOriginadoString}")
+                    self.addEstado(estadoOriginadoString)
+                    listaNovosEstadosOriginados.append(list(novoEstadoOriginado))
+                else:
+                    simboloAntigo = self.transicoes[self.getPos(novoEstadoEFString)][self.getPos(estadoOriginadoString)]
+                    # Se já existir uma transição, apenas adicionamos essa nova transição, caso contrário, setamos a transição para esse símbolo
+                    if simboloAntigo == '':
+                        self.transicoes[self.getPos(novoEstadoEFString)][self.getPos(estadoOriginadoString)] = simbolo
                     else:
-                        simboloAntigo = self.transicoes[self.getPos(novoEstadoEFString)][self.getPos(estadoOriginadoString)]
-                        # Se já existir uma transição, apenas adicionamos essa nova transição, caso contrário, setamos a transição para esse símbolo
-                        if simboloAntigo == '':
-                            self.transicoes[self.getPos(novoEstadoEFString)][self.getPos(estadoOriginadoString)] = simbolo
-                        else:
-                            novosSimbolos = [simbolo, simboloAntigo]
-                            self.transicoes[self.getPos(novoEstadoEFString)][self.getPos(estadoOriginadoString)] = self.packSimbolos(novosSimbolos)
+                        novosSimbolos = [simbolo, simboloAntigo]
+                        self.transicoes[self.getPos(novoEstadoEFString)][self.getPos(estadoOriginadoString)] = self.packSimbolos(novosSimbolos)
                         
-            for estado in listaNovosEstadosOriginados:
-                self.calcularNovasTransicoes(estado, refEstados)
-
+        for estado in listaNovosEstadosOriginados:
+            self.calcularNovasTransicoes(estado, refEstados)
+        
     # Adicionar um estado vazio
     def addEstado(self, novoEstado: str) -> None:
         for i in range(len(self.estados)):

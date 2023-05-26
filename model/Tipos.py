@@ -1,4 +1,5 @@
 from enum import Enum
+from datetime import datetime
 
 class Tipo(Enum):
     VAZIO = 1
@@ -29,3 +30,7 @@ class Elemento():
 
     def getTipo(self) -> TipoArquivo:
         return self.tipo
+
+    def log(self, classe: str, msg: str):
+        currentDateAndTime = datetime.now().strftime("%H:%M:%S")
+        print(f"{currentDateAndTime} - [{classe}]  - {msg}")
