@@ -34,3 +34,10 @@ class Elemento():
     def log(self, classe: str, msg: str):
         currentDateAndTime = datetime.now().strftime("%H:%M:%S")
         print(f"{currentDateAndTime} - [{classe}]  - {msg}")
+
+    # Adiciona um elemento em uma lista somente se ele não existe
+    # (Usado pra não precisar transformar toda lista em set e vice-versa)
+    def appendIfNotExists(self, lista: list, element) -> list:
+        setFromLista = set(lista)
+        setFromLista.add(element)
+        return list(setFromLista)

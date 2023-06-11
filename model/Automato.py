@@ -1,4 +1,4 @@
-from .Tipos import TipoArquivo, Elemento, Tipo
+from .Tipos import TipoArquivo, Elemento
 
 #[[], [], []]
 class Automato(Elemento):
@@ -9,14 +9,20 @@ class Automato(Elemento):
         # Matriz NxN onde N = número de estados
         self.transicoes = [['' for column in range(len(self.estados))] for row in range(len(self.estados))]
         self.criarTransicoes(transicoes)
-        self.estado_inicial = estado_inicial
+        self.estado_inicial = estado_inicial.pop()
         self.estados_aceitacao = estados_aceitacao
 
     def getPos(self, simbolo: str) -> int:
         return self.estados.index(simbolo)
 
+    def getPosLista(self, simbolo: str, lista: list) -> int:
+        return lista.index(simbolo)
+
     def getElement(self, index: int) -> str:
         return self.estados[index]
+
+    def getElementLista(self, index: int, lista: list) -> str:
+        return lista[index]
 
     # Transforma string de simbolos "a,b,c" em lista 
     def unpackSimbolos(self, simbolos: str) -> list:
@@ -25,12 +31,18 @@ class Automato(Elemento):
     # Transforma lista de símbolos [a,b,c] em string
     def packSimbolos(self, simbolos: list) -> str:
         if simbolos != None:
-            if len(simbolos) != 0:
-                simbolosSorted = simbolos.copy()
-                simbolosSorted.sort()
-            return ",".join(simbolosSorted)
+            if isinstance(simbolos, list):
+                if len(simbolos) > 0:
+                    simbolosSorted = simbolos.copy()
+                    simbolosSorted.sort()
+                    
+                    return ",".join(simbolosSorted)
+                else:
+                    return ""
+            elif isinstance(simbolos, str):
+                return simbolos
         else:
-            return ""
+            return ""      
 
     def printarTransicoes(self):
         for i in range(len(self.transicoes)):
@@ -52,10 +64,18 @@ class Automato(Elemento):
             destino = listaTransicao[1]
             simbolos = listaTransicao[2]
 
-            # Teste para ver se símbolos estão bem estruturados
-            simbolos = self.packSimbolos(self.unpackSimbolos(simbolos))
+            #self.log("criarTransicoes", f"criando transição para {origem} -{simbolos}-> {destino}")
 
-            self.transicoes[self.getPos(origem)][self.getPos(destino)] = simbolos
+            # Teste para ver se símbolos estão bem estruturados
+            simbolos = self.unpackSimbolos(simbolos)
+            transicaoExistente = self.transicoes[self.getPos(origem)][self.getPos(destino)] 
+
+            if transicaoExistente != '':
+                listaTransicaoExistente = self.unpackSimbolos(transicaoExistente)
+                listaTransicaoExistente.extend(simbolos)
+                self.transicoes[self.getPos(origem)][self.getPos(destino)] = self.packSimbolos(listaTransicaoExistente)
+            else:
+                self.transicoes[self.getPos(origem)][self.getPos(destino)] = self.packSimbolos(simbolos)
 
 
     def printar(self):
