@@ -85,7 +85,7 @@ class Automato(Elemento):
         else:
             print("Automato de Pilha:")
         print(f"Estado inicial: ({','.join(self.estado_inicial)})")
-        print(f"Estado(s) de aceitação: ({','.join(self.estados_aceitacao)})")
+        print(f"Estado(s) de aceitação: ({' | '.join(self.estados_aceitacao)})")
         print(f"Alfabeto: ({','.join(self.alfabeto)})")
         
         print("Transições:")
