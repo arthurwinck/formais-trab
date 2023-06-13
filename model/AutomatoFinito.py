@@ -5,7 +5,6 @@ class AutomatoFinito(Automato):
     def __init__(self, estados=None, alfabeto=None, transicoes=None, estado_inicial=None, estados_aceitacao=None) -> None:
         super().__init__(TipoArquivo.AF, estados, alfabeto, transicoes, estado_inicial, estados_aceitacao)
  
-
     def determinizar(self):
         transicoesAntigas = self.transicoes.copy()
         estadosAntigos = self.estados.copy()
@@ -146,3 +145,108 @@ class AutomatoFinito(Automato):
             for parteEstado in listaEstado:
                 if parteEstado in self.estados_aceitacao and estado not in self.estados_aceitacao:
                     self.estados_aceitacao.append(estado)
+
+    def minimizar(self) -> None:
+        self.removerInalcancaveis()
+        print(f"transições por s: {self.transicoes[self.getPos('s')]}")
+        self.removerMortos()
+        print(f"transições por s: {self.transicoes[self.getPos('s')]}")
+
+    def removerInalcancaveis(self) -> None:
+        alcancaveis = [self.estado_inicial]
+
+        while True:
+            mudanca = False
+
+            for estado in alcancaveis:
+                novosAlcancaveis = []
+                transicoes = self.transicoes[self.getPos(estado)]
+
+                for estadoDestino, simboloTransicao in enumerate(transicoes):
+                    if simboloTransicao != '' and self.getElement(estadoDestino) not in alcancaveis and self.getElement(estadoDestino) not in novosAlcancaveis:
+                        mudanca = True
+                        novosAlcancaveis.append(self.getElement(estadoDestino))
+
+                alcancaveis.extend(novosAlcancaveis)
+
+            if not mudanca:
+                break
+        
+        #Não sei porque mas dar sort nos alcancaveis dá erro. So é necessário dar sort nos mortos
+        #alcancaveis.sort()
+        self.atualizarEstadosETransicoes(alcancaveis)
+
+    def removerMortos(self) -> None:
+        vivos = self.estados_aceitacao
+
+        while True:
+            mudanca = False
+
+            for estado in self.estados:
+                novosVivos = []
+                transicoes = self.transicoes[self.getPos(estado)]
+
+                for estadoDestino, simboloTransicao in enumerate(transicoes):
+                    if simboloTransicao != '' and self.getElement(estadoDestino) in vivos and estado not in vivos and estado not in novosVivos:
+                        mudanca = True
+                        novosVivos.append(estado)
+
+                vivos.extend(novosVivos)
+
+            if not mudanca:
+                break
+
+        print(f"Vivos: {vivos}")
+        vivos.sort()
+        self.atualizarEstadosETransicoes(vivos)
+
+
+    def atualizarEstadosETransicoes(self, estadosAlcancaveis: list[str]) -> None:
+        transicoes = self.transicoes.copy()
+        listaEstadosRemovidos = []
+
+        for estadoOrigem, listaTransicao in enumerate(self.transicoes):
+            if self.getElement(estadoOrigem) not in estadosAlcancaveis:
+                listaEstadosRemovidos.append(self.getElement(estadoOrigem))
+
+        for estadoARemover in listaEstadosRemovidos:
+            for i in range(len(self.estados)):
+                transicoes[i][self.getPos(estadoARemover)] = '!'
+            transicoes[self.getPos(estadoARemover)] = ['!']*len(self.estados)
+
+
+        i = 0
+        numeroEstadosRemovidos = len(listaEstadosRemovidos)
+        estadosRemovidos = 0
+
+        while True:
+            if numeroEstadosRemovidos == estadosRemovidos:
+                break
+
+            if transicoes[i].count('!') > 0 and transicoes[i].count('!') == len(transicoes[i]) and transicoes[i]:
+                estadosRemovidos += 1
+
+                try:
+                    transicoes.pop(i)
+
+                    for j in range(len(transicoes)):
+                        transicoes[j].pop(i)
+
+                except IndexError:
+                    self.log("atualizarEstadosETranscioes", f"i = {i} | j = {j}")
+                    print(self.transicoes)
+            else:
+                i += 1
+
+
+        #self.log("atualizarEstadosETranscioes", f"Tamanho da matriz de transições: {transicoes}. Abaixo, tamanho de cada lista de transição:")
+
+        self.transicoes = transicoes
+        self.estados = estadosAlcancaveis
+        self.estados_aceitacao = self.interseccao(self.estados_aceitacao, estadosAlcancaveis)
+
+    def criarTransicoesVazias(self, estadosAlcancaveis: list[str]) -> list[list]:
+        transicoes = []
+        for i in range(len(estadosAlcancaveis)):
+            transicoes[i] = ['']*len(estadosAlcancaveis)                
+        return transicoes

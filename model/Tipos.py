@@ -41,3 +41,12 @@ class Elemento():
         setFromLista = set(lista)
         setFromLista.add(element)
         return list(setFromLista)
+
+    def interseccao(self, lista1: list, lista2: list) -> list:
+        lista = []
+        for item1 in lista1:
+            if item1 in lista2:
+                lista.append(item1)
+
+        return lista
+
