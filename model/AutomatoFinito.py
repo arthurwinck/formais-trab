@@ -147,10 +147,11 @@ class AutomatoFinito(Automato):
                     self.estados_aceitacao.append(estado)
 
     def minimizar(self) -> None:
-        self.removerInalcancaveis()
-        print(f"transições por s: {self.transicoes[self.getPos('s')]}")
-        self.removerMortos()
-        print(f"transições por s: {self.transicoes[self.getPos('s')]}")
+        alcancaveis = self.removerInalcancaveis()
+        #print(f"Depois de inalcancaveis: estados aceitacao: {self.estados_aceitacao} | alcancaveis: {alcancaveis}")
+        vivos = self.removerMortos()
+        #print(f"Depois de mortos: estados aceitacao: {self.estados_aceitacao} | vivos: {vivos}")
+        self.unirEquivalentes()
 
     def removerInalcancaveis(self) -> None:
         alcancaveis = [self.estado_inicial]
@@ -176,8 +177,10 @@ class AutomatoFinito(Automato):
         #alcancaveis.sort()
         self.atualizarEstadosETransicoes(alcancaveis)
 
+        return alcancaveis
+
     def removerMortos(self) -> None:
-        vivos = self.estados_aceitacao
+        vivos = self.estados_aceitacao.copy()
 
         while True:
             mudanca = False
@@ -196,9 +199,11 @@ class AutomatoFinito(Automato):
             if not mudanca:
                 break
 
-        print(f"Vivos: {vivos}")
+        #print(f"Vivos: {vivos}")
         vivos.sort()
         self.atualizarEstadosETransicoes(vivos)
+
+        return vivos
 
 
     def atualizarEstadosETransicoes(self, estadosAlcancaveis: list[str]) -> None:
@@ -250,3 +255,181 @@ class AutomatoFinito(Automato):
         for i in range(len(estadosAlcancaveis)):
             transicoes[i] = ['']*len(estadosAlcancaveis)                
         return transicoes
+
+    # Estados de equivalentes somente se dividem. Divide & Conquer
+    # fazer as divisões localmente (para cada classe) e depois disso atualizar o dicionário
+    def unirEquivalentes(self):
+        
+        dictClasses = {"q0": self.estados_aceitacao, "q1": self.diferenca(self.estados, self.estados_aceitacao)}
+        # print ("Antes da união --------------")
+        # print(f"dictClasses: {dictClasses}")
+        # print(f"self.estados: {self.estados}")
+
+        dictClassesDestino = {}
+        i = 2
+        mudanca = False
+        dictClassesCompare = {}
+
+        while True:
+            mudanca = False
+            dictClassesCompare = dictClasses.copy()
+            for simbolo in self.alfabeto:
+                listaClasses = list(dictClasses.keys())
+                for classe in listaClasses:
+                    listaEstados = dictClasses[classe]
+                    if len(listaEstados) > 1:
+                        dictClassesAtual = {}
+                        dictClassesDestinoAtual = {}
+
+                        for estado in listaEstados:
+                            # Criar dict de classes temporário. Estados podem entrar em classes
+                            # de estados que estejam na mesma classe 
+                            
+                            estadoDestino = self.procurarTransicaoPorSimbolo(estado, simbolo)
+
+                            if estadoDestino is not None:
+                                # Procura pelo dicionário geral
+                                classeDestino = self.procurarClassePorEstado(estadoDestino, dictClasses)
+                            else:
+                                classeDestino = "MORTO"
+                            
+                            # se não existe a classe destino ainda, crio ela. Não é preciso fazer mais nada
+                            if classe not in dictClassesDestinoAtual.keys():
+                                dictClassesDestinoAtual[classe] = classeDestino
+                                dictClassesAtual[classe] = [estado]
+                                mudanca = True
+                            else:
+                                classeDestinoExistente = dictClassesDestinoAtual[classe]
+
+                                # A minha classe destino é diferente da classe destino da minha classe original, vou precisar
+                                # ser remanejado 
+                                #if classeDestino != classeDestinoExistente:
+
+                                # Consigo encontrar uma nova classe criada para essa CLASSE (linha 276) que estou
+                                # iterando? Se sim não é necessário criar uma nova classe  
+                                acomodarNovaClasse = None
+                                
+                                # Já que vou precisar trocar de classe, existe uma classe para eu ir já?
+                                for classeAtual, classeDestinoAtual in dictClassesDestinoAtual.items():
+                                    if classeDestino == classeDestinoAtual:
+                                        acomodarNovaClasse = classeAtual
+
+                                # Sim, só coloco o meu estado nessa nova classe
+                                if acomodarNovaClasse is not None:
+                                    dictClassesAtual[acomodarNovaClasse].append(estado)
+
+                                # Não, preciso criar uma nova classe para mim
+                                else: 
+                                    #listaEstados.remove(estado)
+                                    dictClassesAtual[f"q{i}"] = [estado]
+                                    dictClassesDestinoAtual[f"q{i}"] = classeDestino
+                                    i += 1
+
+                                mudanca = True
+
+                                                
+                        # Atualizar dicionário global com as infos atualizadas do dicionário local
+                        dictClasses.update(dictClassesAtual)
+                        dictClassesDestino.update(dictClassesDestinoAtual)
+
+            # Realizei toda a iteração e não tive nenhuma mudança? Termino o processo
+            if dictClassesCompare == dictClasses:
+                break
+
+        # print ("Depois da união --------------")
+        # print(f"dictClasses: {dictClasses}")
+        # print(f"self.estados: {self.estados}")
+        self.calcularNovasTransicoesUnificados(dictClasses)
+
+
+
+    def procurarTransicaoPorSimbolo(self, estado: str, simbolo: str) -> str:
+        # em um afd existe apenas uma transição por estado origem por simbolo
+        for estadoDestino, transicao in enumerate(self.transicoes[self.getPos(estado)]):
+            if simbolo in transicao:
+                return self.getElement(estadoDestino)
+
+    def procurarClassePorEstado(self, estado: str, dictClasses: dict):
+        for classe, listaEstados in dictClasses.items():
+            if estado in listaEstados:
+                return classe
+
+    # Iterar sobre todas as classes. Pegando todas as transições e ajeitando o automato para
+    # somente iterar sobre as classes, criando assim um novo automato
+    def calcularNovasTransicoesUnificados(self, dictEstados: dict[str]) -> None:
+        listaEstados = self.estados.copy()
+        listaEstadosVisitados = []
+        transicoes = []
+        novaListaEstados = []
+
+        for classe, listaEstadosClasse in dictEstados.items():
+            
+            listaEstadosClasse.sort()
+            
+            novoEstadoUnificado = classe
+            #novoEstadoUnificado = self.packSimbolos(listaEstadosClasse)
+
+            if novoEstadoUnificado not in novaListaEstados:
+                self.addEstadoTransicaoLista(novoEstadoUnificado, novaListaEstados, transicoes)
+                listaEstadosVisitados.append(novoEstadoUnificado)
+                
+            for estadoExemplo in listaEstadosClasse:
+
+                for estadoDestino, listaTransicao in enumerate(self.transicoes[self.getPos(estadoExemplo)]):
+                    estadoDestinoStr = self.getElement(estadoDestino)
+
+                    classeDestino = self.procurarClassePorEstado(estadoDestinoStr, dictEstados)
+
+                    if classeDestino != classe and classeDestino not in novaListaEstados:
+                        #novoEstadoClasseDestino = self.packSimbolos(dictEstados[classeDestino])
+                        novoEstadoClasseDestino = classeDestino
+                        self.addEstadoTransicaoLista(novoEstadoClasseDestino, novaListaEstados, transicoes)
+
+                    if listaTransicao != '':   
+                        self.editarTransicao(novoEstadoUnificado, novaListaEstados, transicoes, classeDestino, dictEstados, listaTransicao)
+
+
+
+        listaEstadosAceitacao = []
+
+        for novoEstado, listaEstados in dictEstados.items():
+            if listaEstados == [self.estado_inicial]:
+                self.estado_inicial = novoEstado
+            if len(self.interseccao(listaEstados, self.estados_aceitacao)) > 0:
+                listaEstadosAceitacao.append(novoEstado)
+                
+        self.estados = novaListaEstados
+        self.estados_aceitacao = listaEstadosAceitacao
+        self.transicoes = transicoes
+
+    def addEstadoTransicaoLista(self, estado: str, listaEstados: list, transicoes: list[list]) -> None:
+        listaEstados.append(estado)
+        transicoes.append(['']*len(listaEstados))
+
+        for i in range(len(listaEstados)):
+            transicoes[i].append("")
+        
+
+    def editarTransicao(self, estado: str, listaEstados: list, transicoes: list[list], classeDestino: str, dictEstados: dict[str], listaTransicao: str) -> None:
+        pos = self.getPosLista(estado, listaEstados)
+        posDestino = self.getPosLista(classeDestino, listaEstados)
+        #posDestino = self.getPosLista(self.packSimbolos(dictEstados[classeDestino]), listaEstados)
+
+        # print(f"pos: {pos}")
+        # print(f"posDestino: {posDestino}")
+        # print(f"listaEstados: {listaEstados}")
+        # print(f"estado: {estado}")
+        # print(f"classeDestino: {classeDestino}")
+        # print(f"transicoes: {transicoes}")
+
+        if transicoes[pos][posDestino] == '':
+            transicoes[pos][posDestino] = listaTransicao
+        else:
+            itensListaTransicao = self.unpackSimbolos(listaTransicao)
+            transicaoLista = self.unpackSimbolos(transicoes[pos][posDestino])
+            for item in itensListaTransicao:
+                if item not in transicoes[pos][posDestino]:
+                    transicaoLista.append(item)
+
+                transicaoLista.sort()
+                transicoes[pos][posDestino] = self.packSimbolos(transicaoLista)

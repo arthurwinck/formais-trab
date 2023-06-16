@@ -1,6 +1,6 @@
 <AF>
 <estados>
-p q r s x y o
+p q r s
 <estado_inicial>
 p
 <estados_aceitacao>
@@ -17,6 +17,3 @@ q r 1
 r s 0
 r p 1
 s p 1
-s o 0
-x y 1
-y x 0

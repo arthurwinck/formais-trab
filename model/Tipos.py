@@ -50,3 +50,9 @@ class Elemento():
 
         return lista
 
+    def diferenca(self, lista1: list, lista2: list) -> list:
+        lista = []
+        for item1 in lista1:
+            if item1 not in lista2:
+                lista.append(item1)
+        return lista
