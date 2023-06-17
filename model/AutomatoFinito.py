@@ -432,3 +432,54 @@ class AutomatoFinito(Automato):
 
                 transicaoLista.sort()
                 transicoes[pos][posDestino] = self.packSimbolos(transicaoLista)
+
+    # ------------------------ UNIÃO -----------------------
+
+    def unir(self, automato2:Automato):
+        # pega os estados dos dois automatos (faz uma cópia das listas)
+        estados = self.getEstados()
+        estados2 = automato2.getEstados()
+
+        # Verifica se os nomes dos estados são repetidos e troca, para não dar confusão nas transições 
+        for i in range(len(estados2)):
+            if estados2[i] in estados:
+                simb = str(len(estados2) + i + 1)
+                
+                # Verifica se é inicial e e modifica
+                if estados2[i] == automato2.getEstadoInicial():
+                    automato2.estado_inicial = simb
+                # Verificar se é de aceitação e modifica
+                for j in range(len(automato2.estados_aceitacao)):
+                    if automato2.getEstados()[i] == automato2.estados_aceitacao[j]:
+                        automato2.estados_aceitacao[j] = simb
+
+                estados2[i] = simb
+                estados.append(estados2[i])
+                
+        # Fazer a união das transições (unição de matrizes)
+        #self.transicoes += automato2.transicoes
+        for i in range(self.transicoes):
+            print(self.transicoes[i])
+        #print("transições")
+        #print(self.transicoes)
+                
+
+        # Matriz NxN onde N = número de estados
+        #transicoes = [['' for column in range(len(estados))] for row in range(len(estados))]
+        #automato2.criarTransicoes(transicoes)
+
+        print("estados:", estados)
+        print("estados2:", estados)
+        print("estados aceitação 2:", automato2.estados_aceitacao)
+        # Faz a união dos alfabetos e remove símbolos duplicados
+        alfabeto = sorted(set(self.getAlfabeto() + automato2.getAlfabeto()))
+        # Pega os estados inciais antigos
+        estadoInicial = self.getEstadoInicial() + automato2.getEstadoInicial()
+        # Pega os estados finais antigos
+        estadoFinal = self.getEstadoAceitacao() + automato2.getEstadoAceitacao()
+        
+        # pega as transições
+
+        # reunir os elementos dos dois automatos e criar um arquivo que será o aiutomato da união
+        # char o leitor para o arquivo e criar o automato da união.
+        pass

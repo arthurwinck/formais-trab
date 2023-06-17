@@ -135,3 +135,19 @@ class Automato(Elemento):
             transicoes = " | ".join(str(transicoes).center(width) if transicoes else "" for transicoes, width in zip(row, column_widths))
             row_str = f"[{estado_label}] | {transicoes}"
             print(row_str)
+
+    # Retorna o estado inicial do autômato
+    def getEstadoInicial(self):
+        return self.estado_inicial
+
+    # Retorna os estados finais do autômato
+    def getEstadoAceitacao(self):
+        return self.estados_aceitacao
+
+    # Retorna a lista de estados do autômato
+    def getEstados(self):
+        return self.estados
+
+    # Retorna o alfabeto do autômato
+    def getAlfabeto(self):
+        return self.alfabeto

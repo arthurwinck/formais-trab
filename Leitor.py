@@ -1,5 +1,5 @@
 from model.Tipos import Elemento, TipoArquivo
-from model.GramaticaLC import GramaticaLC
+#from model.GramaticaLC import GramaticaLC
 from model.GramaticaRegular import GramaticaRegular
 from model.AutomatoFinito import AutomatoFinito
 from model.ExpressaoRegular import ExpressaoRegular
@@ -124,10 +124,14 @@ class Leitor:
 if __name__ == "__main__":
 
     # AF -----------------------------
-    # leitorAFND = Leitor("./arquivos/automatos/afnd_moodle_1.txt")
-    # afnd = leitorAFND.ler()
+    leitorAFND = Leitor("./arquivos/automatos/af.txt")
+    leitorAFND2 = Leitor("./arquivos/automatos/af.txt")
+    afnd = leitorAFND.ler()
+    afnd2 = leitorAFND2.ler()
     # print("AFND Inicial ---------------")
-    # afnd.printar()
+    afnd.unir(afnd2)
+    afnd.printar()
+    afnd2.printar()
     # afnd.determinizar()
     # print("AFD Determinizado ---------------")
     # afnd.printar()
@@ -136,6 +140,6 @@ if __name__ == "__main__":
     # afnd.printar()
 
     # GLC -----------------------------
-    leitorGLC = Leitor("./arquivos/gramaticas/glc.txt")
-    glc = leitorGLC.ler()
-    glc.printar()
+    #leitorGLC = Leitor("./arquivos/gramaticas/glc.txt")
+    #glc = leitorGLC.ler()
+    #glc.printar()
