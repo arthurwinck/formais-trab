@@ -112,7 +112,7 @@ class Leitor:
     # Porque aqui é -1?
     def pegarProducoes(self, texto):
         indice = texto.index('<producoes>')
-        return texto[indice+1:-1]
+        return texto[indice+1:]
 
     # Expressões Regulares
 
@@ -123,22 +123,19 @@ class Leitor:
 
 if __name__ == "__main__":
 
-    #leitorAF = Leitor("./arquivos/af.txt")
-    #leitorAFP = Leitor("./arquivos/afp.txt")
-    leitorAFND = Leitor("./arquivos/afnd_moodle_1.txt")
-    #af = leitorAF.ler()
-    #afp = leitorAFP.ler()
-    afnd = leitorAFND.ler()
-    #afnd.printar()
-    #afp.printar()
-    print("AFND Inicial ---------------")
-    afnd.printar()
-    afnd.determinizar()
-    #afnd.printar()
-    print("AFD Determinizado ---------------")
-    afnd.printar()
-    afnd.minimizar()
-    print("AFD MINIMIZADO ---------------")
-    afnd.printar()
-    #afnd.printar()
-    #afnd.printarTabela()
+    # AF -----------------------------
+    # leitorAFND = Leitor("./arquivos/automatos/afnd_moodle_1.txt")
+    # afnd = leitorAFND.ler()
+    # print("AFND Inicial ---------------")
+    # afnd.printar()
+    # afnd.determinizar()
+    # print("AFD Determinizado ---------------")
+    # afnd.printar()
+    # afnd.minimizar()
+    # print("AFD MINIMIZADO ---------------")
+    # afnd.printar()
+
+    # GLC -----------------------------
+    leitorGLC = Leitor("./arquivos/gramaticas/glc.txt")
+    glc = leitorGLC.ler()
+    glc.printar()

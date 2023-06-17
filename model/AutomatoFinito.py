@@ -5,6 +5,9 @@ class AutomatoFinito(Automato):
     def __init__(self, estados=None, alfabeto=None, transicoes=None, estado_inicial=None, estados_aceitacao=None) -> None:
         super().__init__(TipoArquivo.AF, estados, alfabeto, transicoes, estado_inicial, estados_aceitacao)
  
+    # DETERMINIZAÇÂO
+    # -----------------------------------------------------------------------------------------------------------------------------------------------------------
+
     def determinizar(self):
         transicoesAntigas = self.transicoes.copy()
         estadosAntigos = self.estados.copy()
@@ -145,6 +148,9 @@ class AutomatoFinito(Automato):
             for parteEstado in listaEstado:
                 if parteEstado in self.estados_aceitacao and estado not in self.estados_aceitacao:
                     self.estados_aceitacao.append(estado)
+
+    # MINIMIZAÇÃO
+    # -----------------------------------------------------------------------------------------------------------------------------------------------------------
 
     def minimizar(self) -> None:
         alcancaveis = self.removerInalcancaveis()
@@ -414,13 +420,6 @@ class AutomatoFinito(Automato):
         pos = self.getPosLista(estado, listaEstados)
         posDestino = self.getPosLista(classeDestino, listaEstados)
         #posDestino = self.getPosLista(self.packSimbolos(dictEstados[classeDestino]), listaEstados)
-
-        # print(f"pos: {pos}")
-        # print(f"posDestino: {posDestino}")
-        # print(f"listaEstados: {listaEstados}")
-        # print(f"estado: {estado}")
-        # print(f"classeDestino: {classeDestino}")
-        # print(f"transicoes: {transicoes}")
 
         if transicoes[pos][posDestino] == '':
             transicoes[pos][posDestino] = listaTransicao
