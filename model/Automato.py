@@ -23,6 +23,9 @@ class Automato(Elemento):
 
     def getElementLista(self, index: int, lista: list) -> str:
         return lista[index]
+    
+    def getTransicoes(self):
+        return self.transicoes
 
     # Transforma string de simbolos "a,b,c" em lista 
     def unpackSimbolos(self, simbolos: str) -> list:

@@ -437,7 +437,7 @@ class AutomatoFinito(Automato):
 
     def unir(self, automato2:Automato):
         # pega os estados dos dois automatos (faz uma cópia das listas)
-        estados = self.getEstados()
+        estados = self.getEstados()[:]
         estados2 = automato2.getEstados()
 
         # Verifica se os nomes dos estados são repetidos e troca, para não dar confusão nas transições 
@@ -458,21 +458,44 @@ class AutomatoFinito(Automato):
                 
         # Fazer a união das transições (unição de matrizes)
         #self.transicoes += automato2.transicoes
-        for i in range(self.transicoes):
-            print(self.transicoes[i])
-        #print("transições")
-        #print(self.transicoes)
-                
+        qtdEstados = len(self.estados) + len(automato2.estados)
+        print("QTD Estados:", qtdEstados)
+        
+        
+        transicoes1 = self.getTransicoes()
+        print("transicoes ANTES:")
+        print(transicoes1)
 
-        # Matriz NxN onde N = número de estados
-        #transicoes = [['' for column in range(len(estados))] for row in range(len(estados))]
-        #automato2.criarTransicoes(transicoes)
+        transicoes2 = automato2.getTransicoes()
+        
+        # Cria os espaços nas transiçoes o primeiro para as transições do segundo
+        for i in range(len(automato2.estados)):
+            for j in range(len(automato2.estados)):
+                transicoes1[i].append('')
 
-        print("estados:", estados)
-        print("estados2:", estados)
-        print("estados aceitação 2:", automato2.estados_aceitacao)
-        # Faz a união dos alfabetos e remove símbolos duplicados
-        alfabeto = sorted(set(self.getAlfabeto() + automato2.getAlfabeto()))
+        print("transicoes DEPOIS:")
+        print(transicoes1)
+
+        # Cria uma lista vazia que serve de offset
+        listaVazia = []
+        for i in range(len(automato2.estados)):
+            listaVazia.append('')
+
+        # Adiciona as trasnsições do segundo no primeiro
+        for i in range(len(transicoes2)):
+            transicoes1.append(listaVazia + transicoes2[i])
+        
+        # Faz a união dos estados no automato 1 -> CORRIGIR ENCAPSULAMENTO
+        self.estados = estados
+
+        # Faz a união do alfabetos, removendo os símbolos duplicados -> CORRIGIR ENCAPSULAMENTO
+        self.alfabeto = sorted(set(self.getAlfabeto() + automato2.getAlfabeto()))
+
+        # arrumar estados inicial e de aceitação
+        # 
+
+       
+        
         # Pega os estados inciais antigos
         estadoInicial = self.getEstadoInicial() + automato2.getEstadoInicial()
         # Pega os estados finais antigos
@@ -482,4 +505,13 @@ class AutomatoFinito(Automato):
 
         # reunir os elementos dos dois automatos e criar um arquivo que será o aiutomato da união
         # char o leitor para o arquivo e criar o automato da união.
+        '''
+        ------ UNIÃO -------
+        -> Criar novo autômato
+        -> Criar novo estado inicial
+        -> Criar trasnsição do estado final de A para o inicial de B
+        -> modificar o nome dos estados (adicionar a e b aos estados)
+        -> Juntar os dois estados
+        -> Juntar as transições
+        '''
         pass
