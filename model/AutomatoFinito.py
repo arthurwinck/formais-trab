@@ -436,82 +436,126 @@ class AutomatoFinito(Automato):
     # ------------------------ UNIÃO -----------------------
 
     def unir(self, automato2:Automato):
-        # pega os estados dos dois automatos (faz uma cópia das listas)
+        self.unirPropriedades(automato2)
+        self.criarEstadoIncial(automato2)
+        self.criarEstadoAceitacao(automato2)
+
+    def criarEstadoIncial(self, automato2:Automato):
+
+        # Obtém as transições do automato
+        transicoes = self.getTransicoes()
+
+        # Cria uma lista vazia, que será a lista de transições do novo estado
+        listaVazia = []
+        for i in range(len(self.estados)):
+            listaVazia.append('')
+        # Adiciona a lista vazia à matriz de transições
+        transicoes = [listaVazia] + transicoes
+
+        # Desloca as linhas da matriz para criar novo estado
+        for i in range(len(transicoes)):
+            transicoes[i] = [''] + transicoes[i]
+
+        # Acrescenta o novo estado à lista de estados
+        self.estados = ['0'] + self.estados
+        self.transicoes = transicoes
+
+        # Insere as transições do novo estado inicial 
+        # para os antigos por épsilon
+        indice = int(self.estado_inicial)
+        self.transicoes[0][indice] = '&'
+        indice = int(automato2.estado_inicial)
+        self.transicoes[0][indice] = '&'
+
+        # Define o novo estado inicial
+        self.estado_inicial = '0'
+
+    def criarEstadoAceitacao(self, automato2:Automato):
+        # Faz uma cópia da lista de estados
         estados = self.getEstados()[:]
+        # Obtém as transições do automato
+        transicoes = self.getTransicoes()
+
+        # Cria uma lista vazia, que será a lista de transições do novo estado
+        listaVazia = []
+        for i in range(len(estados)):
+            listaVazia.append('')
+        # Adiciona a lista vazia à matriz de transições
+        transicoes = transicoes + [listaVazia]
+
+        # Acrescenta as linhas da matriz para criar o novo estado
+        for i in range(len(transicoes)):
+            transicoes[i] = transicoes[i] + ['']
+
+        # Adiciona o novo estado à lista de estados
+        estados.append(str(len(estados)))
+
+        # Define as novas transições do autômato
+        self.transicoes = transicoes
+
+        # Soma os estados de aceitação dos dois autômatos
+        estadosAceitacao = self.estados_aceitacao + automato2.estados_aceitacao
+
+        # Insere as transições para o novo estado de aceitação na matriz
+        for i in range(len(estadosAceitacao)):
+            indice = int(estadosAceitacao[i]) 
+            self.transicoes[indice][len(self.estados)] = '&' 
+
+        # Define a nova lista de estados do autômato
+        self.estados = estados
+
+        # Define a nova lista de estados de aceitação do autômato
+        self.estados_aceitacao = [str(len(self.estados)-1)]
+
+
+    def unirPropriedades(self, automato2:Automato):
+        # Obtém os estados dos dois automatos
+        estados = self.getEstados()[:] # Faz uma cópia da lista
         estados2 = automato2.getEstados()
 
         # Verifica se os nomes dos estados são repetidos e troca, para não dar confusão nas transições 
         for i in range(len(estados2)):
+            # Se o nome for igual
             if estados2[i] in estados:
+                # Calcula o novo nome
                 simb = str(len(estados2) + i + 1)
                 
                 # Verifica se é inicial e e modifica
                 if estados2[i] == automato2.getEstadoInicial():
                     automato2.estado_inicial = simb
+
                 # Verificar se é de aceitação e modifica
                 for j in range(len(automato2.estados_aceitacao)):
                     if automato2.getEstados()[i] == automato2.estados_aceitacao[j]:
                         automato2.estados_aceitacao[j] = simb
 
+                # Atribui o novo nome 
                 estados2[i] = simb
+                # Adiciona à lista de estados
                 estados.append(estados2[i])
                 
-        # Fazer a união das transições (unição de matrizes)
-        #self.transicoes += automato2.transicoes
-        qtdEstados = len(self.estados) + len(automato2.estados)
-        print("QTD Estados:", qtdEstados)
-        
-        
+        # --- UNIÃO DAS TRANSIÇÕES ---
+       
+        # Obtém as transições dos autômatos
         transicoes1 = self.getTransicoes()
-        print("transicoes ANTES:")
-        print(transicoes1)
-
         transicoes2 = automato2.getTransicoes()
         
-        # Cria os espaços nas transiçoes o primeiro para as transições do segundo
+        # Cria os espaços nas transiçoes do primeiro, para adicioanar as transições do segundo
         for i in range(len(automato2.estados)):
             for j in range(len(automato2.estados)):
                 transicoes1[i].append('')
-
-        print("transicoes DEPOIS:")
-        print(transicoes1)
 
         # Cria uma lista vazia que serve de offset
         listaVazia = []
         for i in range(len(automato2.estados)):
             listaVazia.append('')
 
-        # Adiciona as trasnsições do segundo no primeiro
+        # Adiciona as trasnsições do segundo autômato ao primeiro
         for i in range(len(transicoes2)):
             transicoes1.append(listaVazia + transicoes2[i])
         
-        # Faz a união dos estados no automato 1 -> CORRIGIR ENCAPSULAMENTO
+        # Une os estados dos dois autômatos
         self.estados = estados
 
-        # Faz a união do alfabetos, removendo os símbolos duplicados -> CORRIGIR ENCAPSULAMENTO
+        # Faz a união do alfabetos, removendo os símbolos duplicados
         self.alfabeto = sorted(set(self.getAlfabeto() + automato2.getAlfabeto()))
-
-        # arrumar estados inicial e de aceitação
-        # 
-
-       
-        
-        # Pega os estados inciais antigos
-        estadoInicial = self.getEstadoInicial() + automato2.getEstadoInicial()
-        # Pega os estados finais antigos
-        estadoFinal = self.getEstadoAceitacao() + automato2.getEstadoAceitacao()
-        
-        # pega as transições
-
-        # reunir os elementos dos dois automatos e criar um arquivo que será o aiutomato da união
-        # char o leitor para o arquivo e criar o automato da união.
-        '''
-        ------ UNIÃO -------
-        -> Criar novo autômato
-        -> Criar novo estado inicial
-        -> Criar trasnsição do estado final de A para o inicial de B
-        -> modificar o nome dos estados (adicionar a e b aos estados)
-        -> Juntar os dois estados
-        -> Juntar as transições
-        '''
-        pass
