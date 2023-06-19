@@ -433,12 +433,39 @@ class AutomatoFinito(Automato):
                 transicaoLista.sort()
                 transicoes[pos][posDestino] = self.packSimbolos(transicaoLista)
 
+
+    # ---------------------- INTERSEÇÃO --------------------
+
+    def intersecao(self, automato2:Automato):
+        self.unirPropriedades(automato2)
+        self.criarTransicao(automato2)
+        self.criarEstadoAceitacao(automato2, False)
+        
+    def criarTransicao(self, automato2:Automato):
+        # Obtém o estado inicial do segundo autômato
+        estadoInicial2 = int(automato2.estado_inicial)
+        # Obtém os estado de aceitação do primeiro autômato
+        estadosAceitacao = self.getEstadoAceitacao()
+        
+        # Insere as transições, dos estados de aceitação do 
+        # primeiro para o estado inicial do segundo autômato,
+        # na matriz de transições
+        for i in range(len(estadosAceitacao)):
+            indice = int(estadosAceitacao[i])
+            self.transicoes[indice-1][estadoInicial2-1] = '&'
+
+        # Remove os estados de aceitação antigos
+        self.estados_aceitacao = automato2.estados_aceitacao
+
+    def criarEstadoAceitacaoInter(self,automato2:Automato):
+        pass
+
     # ------------------------ UNIÃO -----------------------
 
     def unir(self, automato2:Automato):
         self.unirPropriedades(automato2)
         self.criarEstadoIncial(automato2)
-        self.criarEstadoAceitacao(automato2)
+        self.criarEstadoAceitacao(automato2, True)
 
     def criarEstadoIncial(self, automato2:Automato):
 
@@ -470,7 +497,7 @@ class AutomatoFinito(Automato):
         # Define o novo estado inicial
         self.estado_inicial = '0'
 
-    def criarEstadoAceitacao(self, automato2:Automato):
+    def criarEstadoAceitacao(self, automato2:Automato, uniao):
         # Faz uma cópia da lista de estados
         estados = self.getEstados()[:]
         # Obtém as transições do automato
@@ -488,7 +515,10 @@ class AutomatoFinito(Automato):
             transicoes[i] = transicoes[i] + ['']
 
         # Adiciona o novo estado à lista de estados
-        estados.append(str(len(estados)))
+        if uniao:
+            estados.append(str(len(estados)))
+        else:
+            estados.append(str(len(estados)+1))
 
         # Define as novas transições do autômato
         self.transicoes = transicoes
@@ -498,14 +528,20 @@ class AutomatoFinito(Automato):
 
         # Insere as transições para o novo estado de aceitação na matriz
         for i in range(len(estadosAceitacao)):
-            indice = int(estadosAceitacao[i]) 
+            if uniao:
+                indice = int(estadosAceitacao[i])
+            else:
+                indice = int(estadosAceitacao[i]) -1
             self.transicoes[indice][len(self.estados)] = '&' 
 
         # Define a nova lista de estados do autômato
         self.estados = estados
 
         # Define a nova lista de estados de aceitação do autômato
-        self.estados_aceitacao = [str(len(self.estados)-1)]
+        if uniao:
+            self.estados_aceitacao = [str(len(self.estados)-1)]
+        else:
+            self.estados_aceitacao = [str(len(self.estados))]
 
 
     def unirPropriedades(self, automato2:Automato):

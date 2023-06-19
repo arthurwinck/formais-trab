@@ -124,14 +124,15 @@ class Leitor:
 if __name__ == "__main__":
 
     # AF -----------------------------
-    leitorAFND = Leitor("./arquivos/automatos/af.txt")
-    leitorAFND2 = Leitor("./arquivos/automatos/af.txt")
+    leitorAFND = Leitor("./arquivos/automatos/afnd.txt")
+    leitorAFND2 = Leitor("./arquivos/automatos/afnd.txt")
     afnd = leitorAFND.ler()
     afnd2 = leitorAFND2.ler()
     # print("AFND Inicial ---------------")
-    afnd.unir(afnd2)
+    #afnd.unir(afnd2)
+    afnd.intersecao(afnd2)
     afnd.printar()
-    afnd2.printar()
+    #afnd2.printar()
     # afnd.determinizar()
     # print("AFD Determinizado ---------------")
     # afnd.printar()
