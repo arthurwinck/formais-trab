@@ -124,15 +124,10 @@ class Leitor:
 if __name__ == "__main__":
 
     # AF -----------------------------
-    leitorAFND = Leitor("./arquivos/automatos/afnd.txt")
-    leitorAFND2 = Leitor("./arquivos/automatos/afnd.txt")
-    afnd = leitorAFND.ler()
-    afnd2 = leitorAFND2.ler()
+    # leitorAFND = Leitor("./arquivos/automatos/afnd_moodle_1.txt")
+    # afnd = leitorAFND.ler()
     # print("AFND Inicial ---------------")
-    #afnd.unir(afnd2)
-    afnd.intersecao(afnd2)
-    afnd.printar()
-    #afnd2.printar()
+    # afnd.printar()
     # afnd.determinizar()
     # print("AFD Determinizado ---------------")
     # afnd.printar()
@@ -141,6 +136,6 @@ if __name__ == "__main__":
     # afnd.printar()
 
     # GLC -----------------------------
-    #leitorGLC = Leitor("./arquivos/gramaticas/glc.txt")
-    #glc = leitorGLC.ler()
-    #glc.printar()
+    leitorGLC = Leitor("./arquivos/gramaticas/glc.txt")
+    glc = leitorGLC.ler()
+    glc.printar()
