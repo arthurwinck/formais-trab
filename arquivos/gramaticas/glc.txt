@@ -1,6 +1,6 @@
 <GLC>
 <terminais>
-a b c
+a b c d
 <nao_terminais>
 S A B C
 <simbolo_inicial>

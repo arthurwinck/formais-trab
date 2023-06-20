@@ -113,4 +113,84 @@ class GramaticaLC(Elemento):
         # 4) If A->pBq is a production and FIRST(q) contains Є, 
         # then FOLLOW(B) contains { FIRST(q) – Є } U FOLLOW(A)
 
+        dictFollow = {s: set(()) for s in self.nao_terminais}
+        dictFollow[self.simbolo_inicial] = set('$')
         
+        # Usado para guardar a referência quando um simbolo recebe o follow de outro simbolo
+        # e esse outro simbolo pode ser atualizado
+        dictFollowIn = {s: set(()) for s in self.nao_terminais}
+
+        novoSimbolo = True
+
+        while novoSimbolo:
+            novoSimbolo = False
+
+            # self.producoes é um dicionário em que cada
+            # produção é uma entrada da lista, que o seu corpo é a chave do item
+            # {'A': [aAb, b]} => A -> aAb | b 
+            for cabeca, listaCorpo in self.producoes.items():
+                for corpo in listaCorpo:
+                    simbolosLista = [x for x in corpo]
+
+                    for i, simbolo in enumerate(simbolosLista):
+                        
+                        # Se ele for não terminal precisamos checar quais são seus possíveis símbolos de first
+                        # e também se um dos possíveis firsts dele é o '&'
+                        if simbolo in self.nao_terminais:
+                            alvo = simbolo
+                            followAntigo = dictFollow[alvo]
+
+                            # procurando o próximo símbolo depois desse não terminal
+                            proxSimbolos = simbolosLista[i+1:]
+
+                            if proxSimbolos != []:
+                                firstProx = self.buscarFirstLista(proxSimbolos, dictFirst)
+
+                                dictFollow[alvo].update((firstProx - set('&')))
+
+                                # Se no first do próximo símbolo existe um '&'
+
+                                if '&' in firstProx:
+                                    if cabeca != alvo:
+                                        dictFollowIn[cabeca].add(alvo)
+                            
+                            # Se o próximo simbolo for vazio
+                             # 3) If A->pB is a production, then everything in FOLLOW(A) is in FOLLOW(B).
+                            else:
+                                if cabeca != alvo:
+                                    dictFollowIn[cabeca].add(alvo)
+
+                            if followAntigo != dictFollow[alvo]:
+                                novoSimbolo = True
+
+        novoSimbolo = True
+        while(novoSimbolo):
+            novoSimbolo = False
+            for simboloNaoTerminal, listaIn in dictFollowIn.items():
+                for simboloIn in listaIn:
+                    followAntigo = dictFollow[simboloIn]
+                    dictFollow[simboloIn].update(dictFollow[simboloNaoTerminal])
+
+                    if followAntigo != dictFollow[simboloIn]:
+                        novoSimbolo = True
+
+        return dictFollow
+
+
+    def buscarFirstLista(self, proxSimbolos: list[str], dictFirst: dict) -> set:
+        firstProx = set()
+        for i, simbolo in enumerate(proxSimbolos):
+            # Caso estejamos iterando sobre um simbolo que não possui & em seu first, quer dizer que
+            # paramos a atualização do first. 
+            if '&' not in dictFirst[simbolo]:
+                firstProx.update(dictFirst[simbolo])
+                break
+            # 4) If A->pBq is a production and FIRST(q) contains Є, 
+            # then FOLLOW(B) contains { FIRST(q) – Є } U FOLLOW(A)
+            firstProx.update(dictFirst[simbolo] - set('&'))
+            
+            # Se tivermos no último símbolo e temos '&' na produção, adicionamos no first da produção
+            if i == len(proxSimbolos) - 1:
+                firstProx.add('&')
+
+        return firstProx
