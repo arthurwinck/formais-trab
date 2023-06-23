@@ -33,6 +33,18 @@ class GramaticaLC(Elemento):
         dictFirst = self.calcularFirst()
         dictFollow = self.calcularFollow(dictFirst)
 
+    def fatorarGramatica(self):
+        tentativas = 0
+        for naoTerminal in self.nao_terminais:
+            # resolver não determinismo
+            pass
+
+        for naoTerminal in self.nao_terminais:
+            if tentativas > 15:
+                self.log("fatorarGramatica", "Não foi possível fatorar a gramática")
+                break
+            # existe nao determinismo 
+
 
     def calcularFirst(self) -> dict:
         # If x is a terminal, then FIRST(x) = { ‘x’ }
