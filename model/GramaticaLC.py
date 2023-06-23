@@ -28,10 +28,28 @@ class GramaticaLC(Elemento):
                 dictProducoes[listaProducao[0]].append(listaProducao[1])
 
         return dictProducoes
+
+    # Uma gramática é LL1 se e somente se para cada produção A -> a|b temos que:
+    # 1) - First(a) e First(b) são conjuntos disjuntos
+    #    - (ou) A intersecção de First (b) e First(a) é vazia
+    # 2) - se & está em First(b) então First(a) e Follow(A) são conjuntos disjuntos
+    #    - se & estiver em First(a) então a intersecção de First(a) e Follow(A) é vazia,
+    #    - da mesma forma que First(b) e Follow(A) possuem interseccção vazia
+    def checarLL1(self, dictFirst: dict, dictFollow: dict):
+        for simbolo in self.nao_terminais:
+            if dictFirst[simbolo].intersection(dictFollow[simbolo]) != set():
+                return False
+
+        return True
     
     def criarTabelaAnalise(self):
         dictFirst = self.calcularFirst()
         dictFollow = self.calcularFollow(dictFirst)
+        
+        if self.checarLL1(dictFirst, dictFollow):
+            pass
+        else:
+            self.log("criarTabelaAnalise", "Gramática não é LL(1)")
 
     def fatorarGramatica(self):
         tentativas = 0
