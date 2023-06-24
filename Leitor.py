@@ -1,5 +1,5 @@
 from model.Tipos import Elemento, TipoArquivo
-#from model.GramaticaLC import GramaticaLC
+from model.GramaticaLC import GramaticaLC
 from model.GramaticaRegular import GramaticaRegular
 from model.AutomatoFinito import AutomatoFinito
 from model.ExpressaoRegular import ExpressaoRegular
@@ -138,4 +138,6 @@ if __name__ == "__main__":
     # GLC -----------------------------
     leitorGLC = Leitor("./arquivos/gramaticas/glc.txt")
     glc = leitorGLC.ler()
-    glc.printar()
+    print(glc.verificarNaoDeterminismoDireto())
+    
+    #glc.printar()
