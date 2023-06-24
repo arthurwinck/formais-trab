@@ -7,10 +7,8 @@ S A B C
 S
 <producoes>
 S->aAa
-S->b
-A->bB
-A->C
-B->CA
-B->b
-C->cAd
-C->&
+S->aBb
+A->aC
+B->bC
+C->cdC
+C->cdD

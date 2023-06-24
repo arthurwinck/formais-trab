@@ -36,15 +36,74 @@ class GramaticaLC(Elemento):
     def fatorarGramatica(self):
         tentativas = 0
         for naoTerminal in self.nao_terminais:
-            # resolver não determinismo
-            pass
+            # resolver não determinismo direto
+            # não determinismo direto pode ser de um número variável de símbolos
+            resolverNDDireto = self.resolverNaoDeterminismoDireto()
 
         for naoTerminal in self.nao_terminais:
             if tentativas > 15:
                 self.log("fatorarGramatica", "Não foi possível fatorar a gramática")
                 break
-            # existe nao determinismo 
+            # existe nao determinismo |
 
+
+    def resolverNaoDeterminismoDireto(self):
+        dictPrefixo = self.verificarNaoDeterminismoDireto()
+
+        print(dictPrefixo)
+
+        if len(dictPrefixo) > 0:
+            pass
+
+    def verificarNaoDeterminismoDireto(self) -> dict:
+        # Encontrar prefixo em comum em duas produções que possuem a mesma cabeça
+
+        # Se conseguirmos criar um prefixo maior que ''
+        # colocamos em um dicionário o prefixo e as produções
+        # que a criam
+        dictPrefixo = {}
+        listaPrefixo = []
+
+        for naoTerminais in self.nao_terminais:
+            producoes = self.producoes[naoTerminais]
+            
+            # Iterar sobre cada produção tentando criar um prefixo em comum
+            # com outra produção
+            for i, corpoProducao in enumerate(producoes):
+                # Iterar sobre as outras produções buscando aumentar o prefixo
+                for j, corpoOutraProducao in enumerate(producoes):
+                    if i < j:
+                        prefixo = self.buscarMaiorPrefixo(corpoProducao, corpoOutraProducao)
+                    
+                        if prefixo != '':
+                            if prefixo not in dictPrefixo:
+                                dictPrefixo[prefixo] = [i,j]
+                            else:
+                                dictPrefixo[prefixo].append(j)
+
+                            listaPrefixo.append(prefixo)
+
+        return dictPrefixo
+
+    # Busca maior prefixo de duas produções
+    def buscarMaiorPrefixo(self, corpoProducao: str, corpoOutraProducao: str):
+        prefixo = []
+        pular = False
+        
+        for charCorpo in corpoProducao:
+            if pular:
+                continue
+            
+            for charOutraProducao in corpoOutraProducao:
+                if charCorpo == charOutraProducao:
+                    prefixo.append(charCorpo)
+                    pular = True
+                else:
+                    prefixo = "".join(prefixo)
+                    return prefixo
+        
+        prefixo = "".join(prefixo)
+        return prefixo
 
     def calcularFirst(self) -> dict:
         # If x is a terminal, then FIRST(x) = { ‘x’ }
