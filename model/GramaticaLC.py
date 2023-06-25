@@ -64,14 +64,52 @@ class GramaticaLC(Elemento):
                 break
             # existe nao determinismo |
 
+    def procurarPorNovoSimbolo(self):
+        listaSimbolos = ['!', '@', '#', '$', '%', '*', '(', ')', '?']
+
+        return listaSimbolos.pop()
+
 
     def resolverNaoDeterminismoDireto(self):
-        dictPrefixo = self.verificarNaoDeterminismoDireto()
+        k = 0
+        dictEstadosPrefixo = self.verificarNaoDeterminismoDireto()
+        print(dictEstadosPrefixo)
 
-        print(dictPrefixo)
+        if len(dictEstadosPrefixo) > 0:
+            # {'S': {'a': [0, 1]}, 'A': {}, 'B': {}, 'C': {'cdAab': [0, 1]}}
+            # {estado: dictPrefixo -> {'prefixo': produções que possuem esse prefixo}}
+            for naoTerminal, dictPrefixo in dictEstadosPrefixo.items():
+                # criar um novo estado sempre no padrão Z(k) onde K é um inteiro
+                novoNaoTerminal = self.procurarPorNovoSimbolo()
 
-        if len(dictPrefixo) > 0:
-            pass
+                if novoNaoTerminal is None:
+                    raise Exception("Acabaram os símbolos!")
+
+                self.nao_terminais.append(novoNaoTerminal)
+                self.producoes[novoNaoTerminal] = []
+
+                for prefixo, listaPosProducoes in dictPrefixo.items():
+                    for posProducao in listaPosProducoes:
+                        producao = self.producoes[naoTerminal][posProducao]
+                        restoProducao = producao.removeprefix(prefixo)
+
+                        if restoProducao == '':
+                            restoProducao = '&'
+
+                        # removendo a produção com não-determinismo
+                        self.producoes[naoTerminal].remove(producao)
+
+                        # adicionando a nova produção
+                        if (prefixo + novoNaoTerminal) not in self.producoes[naoTerminal]:
+                            self.producoes[naoTerminal].append(prefixo + novoNaoTerminal)
+
+                        # colocando no novo símbolo as produções para o resto do corpo sentencial
+                        if restoProducao not in self.producoes[novoNaoTerminal]:
+                            self.producoes[novoNaoTerminal].append(restoProducao)
+
+                        
+
+
 
     def verificarNaoDeterminismoDireto(self) -> dict:
         # Encontrar prefixo em comum em duas produções que possuem a mesma cabeça
@@ -79,11 +117,12 @@ class GramaticaLC(Elemento):
         # Se conseguirmos criar um prefixo maior que ''
         # colocamos em um dicionário o prefixo e as produções
         # que a criam
-        dictPrefixo = {}
         listaPrefixo = []
+        dictEstadosPrefixo = {}
 
-        for naoTerminais in self.nao_terminais:
-            producoes = self.producoes[naoTerminais]
+        for naoTerminal in self.nao_terminais:
+            dictPrefixo = {}
+            producoes = self.producoes[naoTerminal]
             
             # Iterar sobre cada produção tentando criar um prefixo em comum
             # com outra produção
@@ -101,27 +140,28 @@ class GramaticaLC(Elemento):
 
                             listaPrefixo.append(prefixo)
 
-        return dictPrefixo
+            dictEstadosPrefixo[naoTerminal] = dictPrefixo
+
+        return dictEstadosPrefixo
 
     # Busca maior prefixo de duas produções
     def buscarMaiorPrefixo(self, corpoProducao: str, corpoOutraProducao: str):
         prefixo = []
         pular = False
         
-        for charCorpo in corpoProducao:
-            if pular:
-                continue
+        for i, charCorpo in enumerate(corpoProducao):
+            charOutraProducao = None
             
-            for charOutraProducao in corpoOutraProducao:
-                if charCorpo == charOutraProducao:
-                    prefixo.append(charCorpo)
-                    pular = True
-                else:
-                    prefixo = "".join(prefixo)
-                    return prefixo
-        
-        prefixo = "".join(prefixo)
-        return prefixo
+            try:
+                charOutraProducao = corpoOutraProducao[i]
+            except IndexError:
+                return prefixo
+
+            if charCorpo == charOutraProducao:
+                prefixo.append(charCorpo)
+            else:
+                prefixo = "".join(prefixo)
+                return prefixo
 
     def calcularFirst(self) -> dict:
         # If x is a terminal, then FIRST(x) = { ‘x’ }

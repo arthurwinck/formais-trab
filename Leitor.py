@@ -138,6 +138,7 @@ if __name__ == "__main__":
     # GLC -----------------------------
     leitorGLC = Leitor("./arquivos/gramaticas/glc.txt")
     glc = leitorGLC.ler()
-    print(glc.verificarNaoDeterminismoDireto())
+    print(glc.resolverNaoDeterminismoDireto())
+    glc.printar()
     
     #glc.printar()

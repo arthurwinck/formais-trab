@@ -10,5 +10,5 @@ S->aAa
 S->aBb
 A->aC
 B->bC
-C->cdC
-C->cdD
+C->cdAabC
+C->cdAabS
