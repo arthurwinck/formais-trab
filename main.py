@@ -1,11 +1,6 @@
 import os
 import Leitor
-from model.Tipos import Elemento, TipoArquivo
-from model.GramaticaLC import GramaticaLC
-from model.GramaticaRegular import GramaticaRegular
-from model.AutomatoFinito import AutomatoFinito
-from model.ExpressaoRegular import ExpressaoRegular
-from model.AutomatoPilha import AutomatoPilha
+
 
 class Menu():
     def __init__(self) -> None:
@@ -21,10 +16,10 @@ class Menu():
 menu = Menu()
 
 def espera():
-    print()
-    print("--------------------------------")
-    enter = input("Pressione ENTER para retornar ao menu.")
-    print("\n")
+    enter = input("Pressione ENTER para retornar ao menu.\n")
+
+def erro():
+    print("Não foi possível realizar a operação, verifique os arquivos de entrada e tente novamente.")
 
 def escolherArquivo(principal, operacao):
     if principal:
@@ -50,14 +45,6 @@ def verificaArquivosGramaticas():
         print("Gramáticas de teste disponíveis:")
         for arquivo in arquivos:
             print(arquivo)
-
-def verificaTodosArquivos():
-    print("Arquivos:\n")
-    verificaArquivosAutomatos()
-    print()
-    verificaArquivosGramaticas()
-
-#verificaTodosArquivos()
 
 # ------------- MENU PRINCIPAL --------------
 
@@ -98,45 +85,83 @@ while True:
 
             if na == 0:
                 break
-            elif na == 1:
-                # Chamar determinização
-                # ADICIONAR OPÇÃO DE EXPORTAR RESULTADO
-                pass
-            elif na == 2:
-                # Chamar conversão para gramática
-                # ADICIONAR OPÇÃO DE EXPORTAR RESULTADO
-                pass
-            elif na == 3:
-                # Chamar minimização
-                # ADICIONAR OPÇÃO DE EXPORTAR RESULTADO
-                pass
-            elif na == 4:
-                verificaArquivosAutomatos()
-                escolherArquivo(False, "união")
 
-                l1 = Leitor.Leitor("./testes/automatos/"+ str(menu.getArquivo()))
-                automato = l1.ler()
-                l2 = Leitor.Leitor("./testes/automatos/"+ str(menu.getArquivo2()))
-                automato2 = l1.ler()
+            elif na == 1: # Determinização
+                try:
+                    print("\n--- Determinização ---\n")
+                    l1 = Leitor.Leitor("./testes/automatos/"+ str(menu.getArquivo()))
+                    automato = l1.ler()
+                    automato.determinizar()
+                    espera()
+                    #automato.printar() # não precisa printar, determinizar() já está printando
+                    # ADICIONAR OPÇÃO DE EXPORTAR RESULTADO
+                except:
+                    erro()
+                    espera()
+                
+            elif na == 2: # Conversão para Gramática
+                try:
+                    print("\n--- Conversão para Gramática ---\n")
+                    l1 = Leitor.Leitor("./testes/automatos/"+ str(menu.getArquivo()))
+                    automato = l1.ler()
+                    espera()
+                    # Chamar conversão para gramática
+                    # ADICIONAR OPÇÃO DE EXPORTAR RESULTADO
+                except:
+                    erro()
+                    espera()
 
-                automato.unir(automato2)
-                automato.printar()
-                espera()
-                # ADICIONAR OPÇÃO DE EXPORTAR RESULTADO
+            elif na == 3: # Minimização
+                try:
+                    print("\n--- Minimização ---\n")
+                    l1 = Leitor.Leitor("./testes/automatos/"+ str(menu.getArquivo()))
+                    automato = l1.ler()
+                    automato.minimizar()
+                    automato.printar()
+                    espera()
+                    # Chamar minimização
+                    # ADICIONAR OPÇÃO DE EXPORTAR RESULTADO
+                except:
+                    erro()
+                    espera()
 
-            elif na == 5:
-                verificaArquivosAutomatos()
-                escolherArquivo(False, "interseção")
+            elif na == 4: # União
+                try:
+                    print("\n--- União ---\n")
+                    verificaArquivosAutomatos()
+                    escolherArquivo(False, "união")
 
-                l1 = Leitor.Leitor("./testes/automatos/"+ str(menu.getArquivo()))
-                automato = l1.ler()
-                l2 = Leitor.Leitor("./testes/automatos/"+ str(menu.getArquivo2()))
-                automato2 = l1.ler()
+                    l1 = Leitor.Leitor("./testes/automatos/"+ str(menu.getArquivo()))
+                    automato = l1.ler()
+                    l2 = Leitor.Leitor("./testes/automatos/"+ str(menu.getArquivo2()))
+                    automato2 = l1.ler()
 
-                automato.intersecao(automato2)
-                automato.printar()
-                espera()
-                # ADICIONAR OPÇÃO DE EXPORTAR RESULTADO
+                    automato.unir(automato2)
+                    automato.printar()
+                    espera()
+                    # ADICIONAR OPÇÃO DE EXPORTAR RESULTADO
+                except:
+                    erro()
+                    espera()
+
+            elif na == 5: # Interseção
+                try:
+                    print("\n--- Interseção ---\n")
+                    verificaArquivosAutomatos()
+                    escolherArquivo(False, "interseção")
+
+                    l1 = Leitor.Leitor("./testes/automatos/"+ str(menu.getArquivo()))
+                    automato = l1.ler()
+                    l2 = Leitor.Leitor("./testes/automatos/"+ str(menu.getArquivo2()))
+                    automato2 = l1.ler()
+
+                    automato.intersecao(automato2)
+                    automato.printar()
+                    espera()
+                    # ADICIONAR OPÇÃO DE EXPORTAR RESULTADO
+                except:
+                    erro()
+                    espera()
 
             else:
                 print("Opção não disponível. Verifique o número digitado.")
@@ -151,37 +176,94 @@ while True:
         while True:
             print("\n------------ MENU GRAMÁTICAS -------------\n")
             print("1 - Converter para AFND")
-            print("2 - Reconhecimento de Sentenças")
+            print("2 - Eliminação de Não-determinismo")
+            print("3 - Fatoração")
+            print("4 - Eliminação de Recursão à Esquerda")
+            print("5 - Firsts e Follows")
+            print("6 - Construção da Tabela LL(1)")
+            print("7 - Simulação de Pilha")
             print("0 - Retornar ao Menu Principal\n")
             na = int(input("Digite o número da operação desejada:\n"))
 
             if na == 0:
                 break
-            elif na == 1:
-                # Chamar conversão para AFND
-                pass
-            elif na == 2:
-                # Chamar Reconheicmento de Sentenças
-                pass
+
+            elif na == 1: # Conversão para AFND
+                try:
+                    print("\n--- Conversão para AFND ---\n")
+                    # Chamar conversão para AFND
+                    espera()
+                    # ADICIONAR OPÇÃO DE EXPORTAR RESULTADO
+                except:
+                    erro()
+                    espera()
+
+            elif na == 2: # Eliminação de Não-determinismo
+                try:
+                    print("\n--- Eliminação de Não-determinismo ---\n")
+                    # Chamar 
+                    espera()
+                    # ADICIONAR OPÇÃO DE EXPORTAR RESULTADO
+                except:
+                    erro()
+                    espera()
+
+            elif na == 3: # Fatoração
+                try:
+                    print("\n--- Fatoração ---\n")
+                    # Chamar 
+                    espera()
+                    # ADICIONAR OPÇÃO DE EXPORTAR RESULTADO
+                except:
+                    erro()
+                    espera()
+
+            elif na == 4: # Eliminação de Recursão à Esquerda
+                try:
+                    print("\n--- Eliminação de Recursão à Esquerda ---\n")
+                    # Chamar 
+                    espera()
+                    # ADICIONAR OPÇÃO DE EXPORTAR RESULTADO
+                except:
+                    erro()
+                    espera()
+
+            elif na == 5: # Firsts e Follows
+                try:
+                    print("\n--- Firsts e Follows ---\n")
+                    leitorGLC = Leitor.Leitor("./testes/gramaticas/"+ str(menu.getArquivo()))
+                    glc = leitorGLC.ler()
+                    glc.printar()
+                    espera()
+                    # ADICIONAR OPÇÃO DE EXPORTAR RESULTADO
+                except:
+                    erro()
+                    espera()
+
+            elif na == 6: # Construção da Tabela LL(1)
+                try:
+                    print("\n--- Construção da Tabela LL(1) ---\n")
+                    # Chamar 
+                    espera()
+                    # ADICIONAR OPÇÃO DE EXPORTAR RESULTADO
+                except:
+                    erro()
+                    espera()
+
+            elif na == 7: # Simulação de Pilha
+                try:
+                    print("\n--- Simulação de Pilha ---\n")
+                    # Chamar 
+                    espera()
+                    # ADICIONAR OPÇÃO DE EXPORTAR RESULTADO
+                except:
+                    erro()
+                    espera()
+
             else:
                 print("Opção não disponível. Verifique o número digitado.")
                 espera()
 
-    elif n == 3:
-        verificaTodosArquivos()
-        espera()
-    elif n == 4:
-        pass
-    elif n == 5:
-        pass
-    elif n == 6:
-        pass
-    elif n == 7:
-        pass
-    elif n == 8:
-        pass
-    elif n == 9:
-        pass
     else:
         print("Opção não disponível. Verifique o número digitado.")
         espera()
