@@ -1,4 +1,5 @@
 from .Tipos import TipoArquivo, Elemento
+from random import randint
 
 
 class GramaticaLC(Elemento):
@@ -9,6 +10,7 @@ class GramaticaLC(Elemento):
         self.producoes = self.arrumarProducoes(producoes)
         self.simbolo_inicial = simbolo_inicial
         self.tabelaAnalise = self.criarTabelaAnalise()
+        self.listaSimbolos = None
 
     def printar(self):
         print(f"self.nao_terminais: {self.nao_terminais}")
@@ -52,7 +54,9 @@ class GramaticaLC(Elemento):
             self.log("criarTabelaAnalise", "Gramática não é LL(1)")
 
     def fatorarGramatica(self):
+        i = 0
         tentativas = 0
+
         for naoTerminal in self.nao_terminais:
             # resolver não determinismo direto
             # não determinismo direto pode ser de um número variável de símbolos
@@ -62,13 +66,35 @@ class GramaticaLC(Elemento):
             if tentativas > 15:
                 self.log("fatorarGramatica", "Não foi possível fatorar a gramática")
                 break
-            # existe nao determinismo |
+            
+            self.resolverNaoDeterminismoIndireto(naoTerminal, i)
+            
+
+            i += 1
+
 
     def procurarPorNovoSimbolo(self):
-        listaSimbolos = ['!', '@', '#', '$', '%', '*', '(', ')', '?']
+        if self.listaSimbolos is None:
+            self.listaSimbolos = [
+            '!', '@', '#', '$', '%',
+            '0', '1', '2', '3', '4', '5', '6', '7', '8', '9',
+            'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j',
+            'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't',
+            'u', 'v', 'w', 'x', 'y', 'z',
+            'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J',
+            'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T',
+            'U', 'V', 'W', 'X', 'Y', 'Z'
+            ]
 
-        return listaSimbolos.pop()
+        while True:
+            if len(self.listaSimbolos) < 1:
+                raise Exception("Não foi possível criar um novo símbolo")
 
+            simbolo = randint(0, len(self.listaSimbolos) - 1)
+            if simbolo in self.terminais or simbolo in self.nao_terminais:
+                self.listaSimbolos.remove(simbolo)
+            else:
+                return simbolo
 
     def resolverNaoDeterminismoDireto(self):
         k = 0
@@ -163,6 +189,74 @@ class GramaticaLC(Elemento):
                 prefixo = "".join(prefixo)
                 return prefixo
 
+    def resolverNaoDeterminismoIndireto(self, naoTerminal: str, i: int):
+        self.verificarNaoDeterminismoIndireto(naoTerminal, i)
+
+    def verificarNaoDeterminismoIndireto(self, naoTerminal: str, i: int):
+        producoesTemp = []
+        relacoes = []
+
+        for producao in self.producoes[naoTerminal]:
+            # buscamos o primeiro símbolo para checarmos se existe um não det. indireto por ele
+            primeiroSimbolo = producao[0]
+
+            # produção é vazia
+            if primeiroSimbolo is None:
+                continue
+
+            # Produção pode ser do tipo 'a&' onde será necessário ajustar produções
+            # caso haja outra produção do tipo 'aX'
+            if primeiroSimbolo in self.terminais and producao not in producoesTemp:
+                producoesTemp.append(producao)
+
+                if primeiroSimbolo not in relacoes:
+                    # producao se relaciona com ela mesma
+                    relacoes.append((producao, producao))
+
+            # Se o primeiro símbolo que estamos vendo é um não terminal
+            # podemos estar lidando com um ND indireto mesmo
+            if primeiroSimbolo in self.nao_terminais:
+                # buscar produções do não terminal
+                producoesPrimeiroSimbolo = self.producoes[primeiroSimbolo]
+
+                # Sabemos que os símbolos só possuem um caractere -> não é necessário índice
+                producoesDerivadas, relacaoDerivadaOrigem = self.obterProducoesDerivadas(producao, producoesPrimeiroSimbolo)
+
+                for producaoDerivada in producoesDerivadas:
+                    if producaoDerivada not in producoesTemp:
+                        producoesTemp.append(producaoDerivada)
+
+                for relDerivadaOrigem in relacaoDerivadaOrigem:
+                    if relDerivadaOrigem not in relacaoDerivadaOrigem:
+                        relacaoDerivadaOrigem.append(relDerivadaOrigem)
+
+        # Alterar função de verificar não determinismo direto para que seja por parametro e
+        # nao atributo de classe
+        dictEstadosPrefixo = self.verificarNaoDeterminismoDireto()
+
+        
+
+    # A ideia é derivar até encontrarmos (ou terminarmos de ver as produções)
+    def obterProducoesDerivadas(self, producaoOrigem: str, producoesPrimeiroSimbolo: list[str]) -> tuple[list, list]:
+        producoesDerivadas = []
+        relacaoDerivadaOrigem = []
+
+        for producaoPrimeiroSimbolo in producoesPrimeiroSimbolo:
+            
+            # Como somente possuimos símbolos de 1 caractere, pegamos sempre o primeiro
+            # caractere da producao origem 
+            producaoDerivada = producaoPrimeiroSimbolo + producaoOrigem[0]
+            relacao = (producaoDerivada, producaoOrigem)
+
+            if producaoDerivada not in producoesDerivadas:
+                producoesDerivadas.append(producaoDerivada)
+
+            if relacao not in relacaoDerivadaOrigem:
+                relacaoDerivadaOrigem
+
+        return (producoesDerivadas, relacaoDerivadaOrigem)
+
+
     def calcularFirst(self) -> dict:
         # If x is a terminal, then FIRST(x) = { ‘x’ }
         dictFirst = {s: set((s,)) for s in self.terminais + ['&']}
@@ -232,6 +326,9 @@ class GramaticaLC(Elemento):
         return corpo
 
     def calcularFollow(self, dictFirst: dict) -> dict:
+        if dictFirst is None:
+            dictFirst = self.calcularFirst()
+
         # 1) FOLLOW(S) = { $ }   // where S is the starting Non-Terminal
 
         # 2) If A -> pBq is a production, where p, B and q are any grammar symbols,

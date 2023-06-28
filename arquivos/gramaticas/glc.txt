@@ -1,14 +1,17 @@
 <GLC>
 <terminais>
-a b c d
+b c v f ; o e
 <nao_terminais>
-S A B C
+P K V C F
 <simbolo_inicial>
-S
+P
 <producoes>
-S->aAa
-S->aBb
-A->aC
-B->bC
-C->cdAabC
-C->cdAabS
+P->KVC
+K->cK
+K->&
+V->vV
+V->F
+F->fP;F
+C->bVCe
+C->o;C
+C->&
