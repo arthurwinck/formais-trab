@@ -119,15 +119,62 @@ class Leitor:
     def pegarExpressao(self, texto):
         indice = texto.index('<expressao>')
         return texto[indice+1]
+    
+    def exportarGramatica(self,  tipo: TipoArquivo, elemento: Elemento):
+        arquivo = ""
+        if (tipo == TipoArquivo.GLC):
+            arquivo += "<GLC> \n"
+        if (tipo == TipoArquivo.GR):
+            arquivo += "<GR> \n" 
+        arquivo += "<terminais> \n"
+        separador = ' '
+        arquivo += f"{separador.join(elemento.terminais)} \n"
+        arquivo += "<nao_terminais> \n"
+        arquivo += f"{separador.join(elemento.nao_terminais)} \n"
+        arquivo += "<simbolo_inicial> \n"
+        arquivo += f"{separador.join(elemento.simbolo_inicial)} \n"
+        arquivo += "<producoes> \n"
+        for chave, valores in elemento.producoes.items():
+            for valor in valores:
+                arquivo += f"{chave}->{valor}\n"
+        with open("arquivos\gramaticas\gramatica.txt", "w") as file:
+            file.write(arquivo)
 
+    def exportarAutomato(self,  tipo: TipoArquivo, elemento: Elemento):
+        arquivo = ""
+        if (tipo == TipoArquivo.AFP):
+            arquivo += "<AFP> \n"
+        if (tipo == TipoArquivo.AF):
+            arquivo += "<AF> \n" 
+        arquivo += "<estados> \n"
+        separador = ' '
+        arquivo += f"{separador.join(elemento.estados)} \n"
+        arquivo += "<estado_inicial> \n"
+        arquivo += f"{separador.join(elemento.estado_inicial)} \n"
+        arquivo += "<estados_aceitacao> \n"
+        arquivo += f"{separador.join(elemento.estados_aceitacao)} \n"
+        arquivo += "<alfabeto> \n"
+        arquivo += f"{separador.join(elemento.alfabeto)} \n"
+        arquivo += "<transicoes> \n"
+        transicoesFormatadas = ''
+        for i, origem in enumerate(elemento.estados):
+            for j, destino in enumerate(elemento.estados):
+                for k, simbolo in enumerate(elemento.transicoes[i][j]):
+                    if simbolo and simbolo != ",":
+                        transicao = f"{origem} {destino} {simbolo}\n"
+                        transicoesFormatadas += transicao
+        arquivo += transicoesFormatadas
+        with open("arquivos\\automatos\\automato.txt", "w") as file:
+            file.write(arquivo)
 
 if __name__ == "__main__":
 
     # AF -----------------------------
-    # leitorAFND = Leitor("./arquivos/automatos/afnd_moodle_1.txt")
-    # afnd = leitorAFND.ler()
+    leitorAFND = Leitor("./arquivos/automatos/afnd2.txt")
+    afnd = leitorAFND.ler()
     # print("AFND Inicial ---------------")
-    # afnd.printar()
+    afnd.printar()
+    leitorAFND.exportarAutomato(TipoArquivo.AFP, afnd)
     # afnd.determinizar()
     # print("AFD Determinizado ---------------")
     # afnd.printar()
@@ -136,9 +183,11 @@ if __name__ == "__main__":
     # afnd.printar()
 
     # GLC -----------------------------
-    leitorGLC = Leitor("./arquivos/gramaticas/glc.txt")
-    glc = leitorGLC.ler()
-    print(glc.resolverNaoDeterminismoDireto())
-    glc.printar()
+    # leitorGLC = Leitor("./arquivos/gramaticas/glc.txt")
+    # glc = leitorGLC.ler()
+    # print(glc.resolverNaoDeterminismoDireto())
+    # glc.printar()
+    # print("-----")
+    # leitorGLC.exportarGramatica(TipoArquivo.GLC, glc)
     
     #glc.printar()
