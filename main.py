@@ -1,7 +1,6 @@
 import os
 import Leitor
-
-
+from model.Tipos import Elemento, TipoArquivo
 class Menu():
     def __init__(self) -> None:
         arquivo = ""
@@ -94,7 +93,7 @@ while True:
                     automato.determinizar()
                     espera()
                     #automato.printar() # não precisa printar, determinizar() já está printando
-                    # ADICIONAR OPÇÃO DE EXPORTAR RESULTADO
+                    leitorGLC.exportarAutomato(TipoArquivo.AF, automato)
                 except:
                     erro()
                     espera()
@@ -120,7 +119,7 @@ while True:
                     automato.printar()
                     espera()
                     # Chamar minimização
-                    # ADICIONAR OPÇÃO DE EXPORTAR RESULTADO
+                    leitorGLC.exportarAutomato(TipoArquivo.AF, automato)
                 except:
                     erro()
                     espera()
@@ -139,7 +138,7 @@ while True:
                     automato.unir(automato2)
                     automato.printar()
                     espera()
-                    # ADICIONAR OPÇÃO DE EXPORTAR RESULTADO
+                    leitorGLC.exportarAutomato(TipoArquivo.AF, automato)
                 except:
                     erro()
                     espera()
@@ -158,6 +157,8 @@ while True:
                     automato.intersecao(automato2)
                     automato.printar()
                     espera()
+                    leitorGLC.exportarAutomato(TipoArquivo.AF, automato)
+
                     # ADICIONAR OPÇÃO DE EXPORTAR RESULTADO
                 except:
                     erro()
@@ -206,7 +207,7 @@ while True:
                     glc.fatorarGramatica()
                     glc.printar()
                     espera()
-                    # ADICIONAR OPÇÃO DE EXPORTAR RESULTADO
+                    leitorGLC.exportarGramatica(TipoArquivo.GLC, glc)
                 except:
                     erro()
                     espera()
@@ -219,7 +220,7 @@ while True:
                     glc.removerRecursao()
                     glc.printar()
                     espera()
-                    # ADICIONAR OPÇÃO DE EXPORTAR RESULTADO
+                    leitorGLC.exportarGramatica(TipoArquivo.GLC, glc)
                 except:
                     erro()
                     espera()
@@ -232,7 +233,7 @@ while True:
                     glc.calcularFirst()
                     glc.printar()
                     espera()
-                    # ADICIONAR OPÇÃO DE EXPORTAR RESULTADO
+                    leitorGLC.exportarGramatica(TipoArquivo.GLC, glc)
                 except:
                     erro()
                     espera()
@@ -245,7 +246,7 @@ while True:
                     glc.calcularFollow()
                     glc.printar()
                     espera()
-                    # ADICIONAR OPÇÃO DE EXPORTAR RESULTADO
+                    leitorGLC.exportarGramatica(TipoArquivo.GLC, glc)
                 except:
                     erro()
                     espera()                    
@@ -258,7 +259,7 @@ while True:
                     glc.criarTabelaAnalise()
                     glc.printar()
                     espera()
-                    # ADICIONAR OPÇÃO DE EXPORTAR RESULTADO
+                    leitorGLC.exportarGramatica(TipoArquivo.GLC, glc)
                 except:
                     erro()
                     espera()
@@ -270,6 +271,7 @@ while True:
                     inputSentenca = input("Digite a sentença:")
                     glc.reconhecer(inputSentenca)
                     espera()
+                    leitorGLC.exportarGramatica(TipoArquivo.GLC, glc)
                     # ADICIONAR OPÇÃO DE EXPORTAR RESULTADO
                 except:
                     erro()
