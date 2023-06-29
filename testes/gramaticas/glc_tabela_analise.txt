@@ -1,0 +1,17 @@
+<GLC>
+<terminais>
+c v f ; e o b
+<nao_terminais>
+P K V F C
+<simbolo_inicial>
+P
+<producoes>
+P->KVC
+K->cK
+K->&
+V->vV
+V->F
+F->fP;F
+C->bVCe
+C->o;C
+C->&
