@@ -1,0 +1,14 @@
+<GLC> 
+<terminais> 
+a b c d 
+<nao_terminais> 
+S A B C 
+<simbolo_inicial> 
+S 
+<producoes> 
+S->aAa
+S->aBb
+A->aC
+B->bC
+C->cdAabC
+C->cdAabS
