@@ -136,7 +136,7 @@ if __name__ == "__main__":
     # afnd.printar()
 
     # GLC -----------------------------
-    leitorGLC = Leitor("./arquivos/gramaticas/glc.txt")
+    leitorGLC = Leitor("./testes/gramaticas/glc.txt")
     glc = leitorGLC.ler()
     print(glc.resolverNaoDeterminismoDireto())
     glc.printar()
