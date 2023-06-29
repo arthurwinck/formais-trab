@@ -266,7 +266,9 @@ while True:
             elif na == 7: # Simulação de Pilha
                 try:
                     print("\n--- Simulação de Pilha ---\n")
-                    # Chamar 
+                    glc = leitorGLC.ler()
+                    inputSentenca = input("Digite a sentença:")
+                    glc.reconhecer(inputSentenca)
                     espera()
                     # ADICIONAR OPÇÃO DE EXPORTAR RESULTADO
                 except:

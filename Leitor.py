@@ -190,7 +190,8 @@ if __name__ == "__main__":
     #print(glc.resolverNaoDeterminismoDireto())
     #glc.printar()
     print(glc.producoes)
-    glc.removerRecursao()
+    glc.criarTabelaAnalise()
+    glc.reconhecer('cvfo;be;be')
     print(glc.producoes)
 
     #glc.printar()

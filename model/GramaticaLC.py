@@ -85,6 +85,56 @@ class GramaticaLC(Elemento):
                 dictEstadosPrefixo = self.resolverNaoDeterminismoIndireto(naoTerminal, i)
                 resolverNDDireto = self.resolverNaoDeterminismoDireto(dictEstadosPrefixo)
 
+    def reconhecer(self, sentenca):
+        if self.tabelaAnalise is None:
+            self.log("Reconhecer", "GLC não possui tabela de análise")
+
+        sentenca += '$'
+        sentenca = [*sentenca]
+        pilha = []
+        pilha.append('$')
+        pilha.append(self.simbolo_inicial)
+
+        cabecote = 0
+
+        while True:
+            topo = pilha[len(pilha) - 1]
+            if topo == sentenca[cabecote]:
+                # Condição de aceite - $
+                if topo == '$':
+                    return True
+                # Continuar análise
+                if topo in self.terminais:
+                    # Desempilhar 
+                    antigoTopo = pilha.pop()
+                    cabecote += 1
+                else:
+                    return False
+
+            # Descobrir qual ação tomar pois temos um não terminal
+            elif topo in self.nao_terminais and sentenca[cabecote] in self.terminais:
+                acao = self.tabelaAnalise[topo][sentenca[cabecote]]
+
+                # Ação não documentada, não é possível continuar 
+                if acao == -1:
+                    return False
+
+                # Obter e realizar ação para substituir produção
+                else:
+                    pilha.pop()
+                    producao = self.mapearProducoes(acao)
+                    simbolos = producao.split('->')
+                    corpo = ''.join(simbolos[1::])
+                    corpo = [*corpo]
+
+                    if corpo != ['&']:
+
+                        while(True):
+                            if len(corpo) < 1:
+                                break
+
+                            pilha.append(corpo.pop())
+
 
     def procurarPorNovoSimbolo(self) -> str:
         # tentar sempre pegar letras
