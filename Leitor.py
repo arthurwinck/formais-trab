@@ -136,11 +136,14 @@ if __name__ == "__main__":
     # afnd.printar()
 
     # GLC -----------------------------
-    leitorGLC = Leitor("./arquivos/gramaticas/glc.txt")
+    leitorGLC = Leitor("./arquivos/gramaticas/glc_tabela_analise.txt")
     glc = leitorGLC.ler()
     
-    print(glc.calcularFollow(dictFirst=None))
+    #print(glc.calcularFollow(dictFirst=None))
     #print(glc.resolverNaoDeterminismoDireto())
     #glc.printar()
-    
+    print(glc.producoes)
+    glc.criarTabelaAnalise()
+    print(glc.producoes)
+
     #glc.printar()
