@@ -170,11 +170,11 @@ class Leitor:
 if __name__ == "__main__":
 
     # AF -----------------------------
-    leitorAFND = Leitor("./arquivos/automatos/afnd2.txt")
-    afnd = leitorAFND.ler()
-    # print("AFND Inicial ---------------")
-    afnd.printar()
-    leitorAFND.exportarAutomato(TipoArquivo.AFP, afnd)
+    # leitorAFND = Leitor("./arquivos/automatos/afnd2.txt")
+    # afnd = leitorAFND.ler()
+    # # print("AFND Inicial ---------------")
+    # afnd.printar()
+    # leitorAFND.exportarAutomato(TipoArquivo.AFP, afnd)
     # afnd.determinizar()
     # print("AFD Determinizado ---------------")
     # afnd.printar()
@@ -183,14 +183,14 @@ if __name__ == "__main__":
     # afnd.printar()
 
     # GLC -----------------------------
-    leitorGLC = Leitor("./arquivos/gramaticas/glc_tabela_analise.txt")
+    leitorGLC = Leitor("./testes/gramaticas/glc_recursiva_a_esq.txt")
     glc = leitorGLC.ler()
     
     #print(glc.calcularFollow(dictFirst=None))
     #print(glc.resolverNaoDeterminismoDireto())
     #glc.printar()
     print(glc.producoes)
-    glc.criarTabelaAnalise()
+    glc.removerRecursao()
     print(glc.producoes)
 
     #glc.printar()

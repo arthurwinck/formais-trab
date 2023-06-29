@@ -12,24 +12,11 @@ class GramaticaLC(Elemento):
         self.tabelaAnalise = None
         self.listaSimbolos = None
 
-    def printar(self):
-        print(f"self.nao_terminais: {self.nao_terminais}")
-        print(f"self.terminais: {self.terminais}")
-        print(f"self.producoes: {self.producoes}")
-        print(f"self.simbolo_inicial: {self.simbolo_inicial}")
-
-    def arrumarProducoes(self, producoes: list) -> dict:
-        dictProducoes = {}
-        
-        for producao in producoes:
-            listaProducao = producao.split("->")
-
-            if listaProducao[0] not in dictProducoes.keys():
-                dictProducoes[listaProducao[0]] = [listaProducao[1]]
-            else:
-                dictProducoes[listaProducao[0]].append(listaProducao[1])
-
-        return dictProducoes
+    # Função principal para remover recursão
+    def removerRecursao(self):
+        self.removerRecursaoDireta()
+        self.removerRecursaoIndireta()
+        self.removerRecursaoDireta()
 
     # Uma gramática é LL1 se e somente se para cada produção A -> a|b temos que:
     # 1) - First(a) e First(b) são conjuntos disjuntos
@@ -78,6 +65,7 @@ class GramaticaLC(Elemento):
                         if self.tabelaAnalise[naoTerminal][simboloFollow] == -1:
                             self.tabelaAnalise[naoTerminal][simboloFollow] = numero
     
+    # Função principal para fatorar a gramática
     def fatorarGramatica(self):
         i = 0
         tentativas = 5
@@ -359,7 +347,6 @@ class GramaticaLC(Elemento):
 
         self.producoes = novasProducoes
 
-
     def removerRecursaoDireta(self):
         novasProducoes = {}
         
@@ -594,3 +581,21 @@ class GramaticaLC(Elemento):
             for terminal in terminais:
                 self.tabelaAnalise[naoTerminal][terminal] = -1
 
+    def printar(self):
+        print(f"self.nao_terminais: {self.nao_terminais}")
+        print(f"self.terminais: {self.terminais}")
+        print(f"self.producoes: {self.producoes}")
+        print(f"self.simbolo_inicial: {self.simbolo_inicial}")
+
+    def arrumarProducoes(self, producoes: list) -> dict:
+        dictProducoes = {}
+        
+        for producao in producoes:
+            listaProducao = producao.split("->")
+
+            if listaProducao[0] not in dictProducoes.keys():
+                dictProducoes[listaProducao[0]] = [listaProducao[1]]
+            else:
+                dictProducoes[listaProducao[0]].append(listaProducao[1])
+
+        return dictProducoes
