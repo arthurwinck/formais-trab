@@ -178,9 +178,10 @@ while True:
             print("1 - Converter para AFND")
             print("2 - Fatoração")
             print("3 - Eliminação de Recursão à Esquerda")
-            print("4 - Firsts e Follows")
-            print("5 - Construção da Tabela LL(1)")
-            print("6 - Simulação de Pilha")
+            print("4 - Calcular Firsts")
+            print("5 - Calcular Follows")
+            print("6 - Construção da Tabela LL(1)")
+            print("7 - Simulação de Pilha")
             print("0 - Retornar ao Menu Principal\n")
             na = int(input("Digite o número da operação desejada:\n"))
 
@@ -203,6 +204,7 @@ while True:
                     leitorGLC = Leitor.Leitor("./testes/gramaticas/"+ str(menu.getArquivo()))
                     glc = leitorGLC.ler()
                     glc.fatorarGramatica()
+                    glc.printar()
                     espera()
                     # ADICIONAR OPÇÃO DE EXPORTAR RESULTADO
                 except:
@@ -212,18 +214,9 @@ while True:
             elif na == 3: # Eliminação de Recursão à Esquerda
                 try:
                     print("\n--- Eliminação de Recursão à Esquerda ---\n")
-                    # Chamar 
-                    espera()
-                    # ADICIONAR OPÇÃO DE EXPORTAR RESULTADO
-                except:
-                    erro()
-                    espera()
-
-            elif na == 4: # Firsts e Follows
-                try:
-                    print("\n--- Firsts e Follows ---\n")
                     leitorGLC = Leitor.Leitor("./testes/gramaticas/"+ str(menu.getArquivo()))
                     glc = leitorGLC.ler()
+                    glc.removerRecursao()
                     glc.printar()
                     espera()
                     # ADICIONAR OPÇÃO DE EXPORTAR RESULTADO
@@ -231,19 +224,46 @@ while True:
                     erro()
                     espera()
 
-            elif na == 5: # Construção da Tabela LL(1)
+            elif na == 4: # Firsts
                 try:
-                    print("\n--- Construção da Tabela LL(1) ---\n") 
+                    print("\n--- Firsts ---\n")
                     leitorGLC = Leitor.Leitor("./testes/gramaticas/"+ str(menu.getArquivo()))
                     glc = leitorGLC.ler()
-                    glc.criarTabelaAnalise()
+                    glc.calcularFirst()
+                    glc.printar()
                     espera()
                     # ADICIONAR OPÇÃO DE EXPORTAR RESULTADO
                 except:
                     erro()
                     espera()
 
-            elif na == 6: # Simulação de Pilha
+            elif na == 5: # Follows
+                try:
+                    print("\n--- Follows ---\n")
+                    leitorGLC = Leitor.Leitor("./testes/gramaticas/"+ str(menu.getArquivo()))
+                    glc = leitorGLC.ler()
+                    glc.calcularFollow()
+                    glc.printar()
+                    espera()
+                    # ADICIONAR OPÇÃO DE EXPORTAR RESULTADO
+                except:
+                    erro()
+                    espera()                    
+
+            elif na == 6: # Construção da Tabela LL(1)
+                try:
+                    print("\n--- Construção da Tabela LL(1) ---\n") 
+                    leitorGLC = Leitor.Leitor("./testes/gramaticas/"+ str(menu.getArquivo()))
+                    glc = leitorGLC.ler()
+                    glc.criarTabelaAnalise()
+                    glc.printar()
+                    espera()
+                    # ADICIONAR OPÇÃO DE EXPORTAR RESULTADO
+                except:
+                    erro()
+                    espera()
+
+            elif na == 7: # Simulação de Pilha
                 try:
                     print("\n--- Simulação de Pilha ---\n")
                     # Chamar 
