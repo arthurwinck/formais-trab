@@ -6,7 +6,7 @@ S A B C
 <simbolo_inicial>
 S
 <producoes>
-s->aA
+S->aA
 A->bB
 B->cC
 C->c

@@ -1,6 +1,8 @@
 import os
 import Leitor
 from model.Tipos import Elemento, TipoArquivo
+from model.GramaticaRegular import GramaticaRegular
+
 class Menu():
     def __init__(self) -> None:
         arquivo = ""
@@ -78,6 +80,7 @@ while True:
             print("3 - Minimização")
             print("4 - União")
             print("5 - Interseção")
+            print("6 - Reconhecer")
             print("0 - Retornar ao Menu Principal\n")
             na = int(input("Digite o número da operação desejada:\n"))
             print()
@@ -103,7 +106,15 @@ while True:
                     print("\n--- Conversão para Gramática ---\n")
                     l1 = Leitor.Leitor("./testes/automatos/"+ str(menu.getArquivo()))
                     automato = l1.ler()
+                    dictGR = automato.converterParaGR()
+                    gr = GramaticaRegular(
+                        nao_terminais=dictGR["naoTerminais"],
+                        terminais=dictGR["terminais"],
+                        producoes=dictGR["producoes"],
+                        simbolo_inicial=dictGR["simboloInicial"])
+                    gr.printar()
                     espera()
+                    l1.exportarGramatica(TipoArquivo.GR, gr)
                     # Chamar conversão para gramática
                     # ADICIONAR OPÇÃO DE EXPORTAR RESULTADO
                 except:
@@ -164,6 +175,21 @@ while True:
                     erro()
                     espera()
 
+            elif na == 6: # Reconhecer para Autômatos Finitos
+                try:
+                    print("\n--- Interseção ---\n")
+                    l1 = Leitor.Leitor("./testes/automatos/"+ str(menu.getArquivo()))
+                    automato = l1.ler()
+                    inputSentenca = input("Digite a sentença:")
+
+                    print(f"Resultado: {automato.reconhecer(inputSentenca)}")
+                    automato.printar()
+                    espera()
+                    leitorGLC.exportarAutomato(TipoArquivo.AF, automato)
+
+                except:
+                    erro()
+                    espera()
             else:
                 print("Opção não disponível. Verifique o número digitado.")
                 espera()
@@ -176,7 +202,7 @@ while True:
 
         while True:
             print("\n------------ MENU GRAMÁTICAS -------------\n")
-            print("1 - Converter para AFND")
+            print("1 - Converter GR para AFD")
             print("2 - Fatoração")
             print("3 - Eliminação de Recursão à Esquerda")
             print("4 - Calcular Firsts")
@@ -191,10 +217,13 @@ while True:
 
             elif na == 1: # Conversão para AFND
                 try:
-                    print("\n--- Conversão para AFND ---\n")
-                    # Chamar conversão para AFND
+                    print("\n--- Conversão de GR para AF ---\n")
+                    leitorGR = Leitor.Leitor("./testes/gramaticas/"+ str(menu.getArquivo()))
+                    gr = leitorGR.ler()
+                    automato = gr.converterParaAutomato()
+                    automato.printar()
                     espera()
-                    # ADICIONAR OPÇÃO DE EXPORTAR RESULTADO
+                    leitorGR.exportarAutomato(TipoArquivo.AF, automato)
                 except:
                     erro()
                     espera()

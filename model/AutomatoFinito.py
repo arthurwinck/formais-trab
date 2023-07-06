@@ -595,3 +595,79 @@ class AutomatoFinito(Automato):
 
         # Faz a união do alfabetos, removendo os símbolos duplicados
         self.alfabeto = sorted(set(self.getAlfabeto() + automato2.getAlfabeto()))
+
+    def reconhecer(self, sentenca: str) -> bool:
+        # Primeiro passo determinizar automato
+        self.determinizar()
+
+        if len(self.interseccaoLista(self.alfabeto, list(sentenca))) != len(self.alfabeto):
+            return False
+        
+        estadoAtual = self.estado_inicial
+        for simbolo in sentenca:
+            for estadoPos, listaTransicao in enumerate(estadoAtual):
+                breakEstado = False
+                
+                for transicao in listaTransicao:
+                    if transicao == simbolo:
+                        estadoAtual = self.getElement(estadoPos)
+                        breakEstado = True
+                        break
+
+                if breakEstado:
+                    break
+
+        return estadoAtual in self.estados_aceitacao
+    
+    def converterParaGR(self):
+        # Criando um dicionário para relacionar os novos
+        # símbolos da gramática com o autômato
+        alias = {self.estado_inicial: "S"}
+        listaEstados = list(self.estados)
+        listaEstados.remove(self.estado_inicial)
+        letra = "A"
+        i = 0
+
+        for estado in listaEstados:
+            alias[estado] = letra            
+            letra = chr(ord(letra) + 1)
+            
+        # Não terminais são todos os estados do nosso autômato 
+        naoTerminais = list(alias.values())
+        
+        # terminais são os símbolos que são consumidos nas transições de estados
+        terminais = self.alfabeto
+
+        # Símbolo inicial
+        simboloInicial = alias[self.estado_inicial]
+
+        # Produções
+        producoes = {}
+
+        for posEstadoOrigem, listaTransicoes in enumerate(self.transicoes):
+            for posEstadoDestino, listaSimbolos in enumerate(listaTransicoes):
+                if listaSimbolos == '':
+                    continue
+                
+                for simbolo in self.unpackSimbolos(listaSimbolos):
+                    producoes[alias[self.getElement(posEstadoOrigem)]] = f"{simbolo}{alias[self.getElement(posEstadoDestino)]}"
+
+                    if self.getElement(posEstadoDestino) in self.estados_aceitacao:
+                        producoes[alias[self.getElement(posEstadoOrigem)]] = f"{simbolo}"
+
+        if self.estado_inicial in self.estados_aceitacao:
+            simboloInicial = chr(ord(letra) + 1)
+            naoTerminais.append(simboloInicial)
+
+            novasProducoes = dict(producoes)
+
+            for naoTerminal, producao in novasProducoes.items():
+                if naoTerminal == alias[self.estado_inicial]:
+                    producoes[simboloInicial] = producao
+                    
+        return {
+            "naoTerminais": naoTerminais,
+            "terminais": terminais,
+            "producoes": producoes,
+            "simboloInicial": simboloInicial
+        }

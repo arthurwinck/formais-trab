@@ -89,6 +89,7 @@ class GramaticaLC(Elemento):
         if self.tabelaAnalise is None:
             self.log("Reconhecer", "GLC não possui tabela de análise")
 
+        # $ para símbolo de fim da pilha
         sentenca += '$'
         sentenca = [*sentenca]
         pilha = []

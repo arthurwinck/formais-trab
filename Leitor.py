@@ -167,6 +167,16 @@ class Leitor:
         with open("arquivos\\automatos\\automato.txt", "w") as file:
             file.write(arquivo)
 
+    def exportarExpressaoRegular(self, elemento: Elemento):
+        arquivo = ""
+        arquivo += "<ER> \n"
+        arquivo += "<alfabeto> \n"
+        separador = ' '
+        arquivo += f"{separador.join(str(elemento.alfabeto))} \n"
+        arquivo += "<expressao> \n"
+        arquivo += f"{elemento.expressao}"
+        print(arquivo)
+
 if __name__ == "__main__":
 
     # AF -----------------------------
@@ -183,15 +193,25 @@ if __name__ == "__main__":
     # afnd.printar()
 
     # GLC -----------------------------
-    leitorGLC = Leitor("./testes/gramaticas/glc_recursiva_a_esq.txt")
-    glc = leitorGLC.ler()
+    # leitorGLC = Leitor("./testes/gramaticas/glc_recursiva_a_esq.txt")
+    # glc = leitorGLC.ler()
     
     #print(glc.calcularFollow(dictFirst=None))
     #print(glc.resolverNaoDeterminismoDireto())
     #glc.printar()
-    print(glc.producoes)
-    glc.criarTabelaAnalise()
-    glc.reconhecer('cvfo;be;be')
-    print(glc.producoes)
+    # print(glc.producoes)
+    # glc.criarTabelaAnalise()
+    # glc.reconhecer('cvfo;be;be')
+    # print(glc.producoes)
 
     #glc.printar()
+
+    er = Leitor('./testes/expressoes/er.txt').ler()
+    #gr.printar()
+    print(er.alfabeto)
+    print(er.expressao)
+    print("oi")
+
+    er.converterParaAFD()
+    
+
