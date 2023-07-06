@@ -1,0 +1,14 @@
+<AF> 
+<estados> 
+S A B C Z 
+<estado_inicial> 
+S 
+<estados_aceitacao> 
+Z 
+<alfabeto> 
+a b c 
+<transicoes> 
+S A a
+A B b
+B C c
+C Z c

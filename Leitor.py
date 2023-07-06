@@ -183,15 +183,21 @@ if __name__ == "__main__":
     # afnd.printar()
 
     # GLC -----------------------------
-    leitorGLC = Leitor("./testes/gramaticas/glc_recursiva_a_esq.txt")
-    glc = leitorGLC.ler()
+    # leitorGLC = Leitor("./testes/gramaticas/glc_recursiva_a_esq.txt")
+    # glc = leitorGLC.ler()
     
     #print(glc.calcularFollow(dictFirst=None))
     #print(glc.resolverNaoDeterminismoDireto())
     #glc.printar()
-    print(glc.producoes)
-    glc.criarTabelaAnalise()
-    glc.reconhecer('cvfo;be;be')
-    print(glc.producoes)
+    # print(glc.producoes)
+    # glc.criarTabelaAnalise()
+    # glc.reconhecer('cvfo;be;be')
+    # print(glc.producoes)
 
     #glc.printar()
+
+    gr = Leitor('./testes/gramaticas/gr.txt').ler()
+    #gr.printar()
+    print(gr.converterParaAutomato())
+    
+
