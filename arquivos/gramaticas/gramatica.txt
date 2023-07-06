@@ -1,14 +1,24 @@
 <GLC> 
 <terminais> 
-a b c d 
+a c d e f 
 <nao_terminais> 
-S A B C 
+C B A S D 
 <simbolo_inicial> 
 S 
 <producoes> 
-S->aAa
-S->aBb
+C->eC
+C->eA
+B->aB
+B->dD
 A->aC
-B->bC
-C->cdAabC
-C->cdAabS
+A->cC
+S->AD
+S->BC
+S->aBBC
+S->dDBC
+S->aCAD
+S->cCAD
+D->fD
+D->AB
+D->aCAB
+D->cCAB
