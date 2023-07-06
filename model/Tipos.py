@@ -24,6 +24,12 @@ class TipoArquivo(Enum):
         elif texto[0] == "<ER>":
             return TipoArquivo.ER
 
+class SimbolosArvore(Enum):
+    CAT = '.'
+    OR = '+'
+    STAR = '*'
+    FOLHA = None
+
 class Elemento():
     def __init__(self, tipo: TipoArquivo) -> None:
         self.tipo = tipo

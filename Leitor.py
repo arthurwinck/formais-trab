@@ -167,6 +167,16 @@ class Leitor:
         with open("arquivos\\automatos\\automato.txt", "w") as file:
             file.write(arquivo)
 
+    def exportarExpressaoRegular(self, elemento: Elemento):
+        arquivo = ""
+        arquivo += "<ER> \n"
+        arquivo += "<alfabeto> \n"
+        separador = ' '
+        arquivo += f"{separador.join(str(elemento.alfabeto))} \n"
+        arquivo += "<expressao> \n"
+        arquivo += f"{elemento.expressao}"
+        print(arquivo)
+
 if __name__ == "__main__":
 
     # AF -----------------------------
@@ -196,8 +206,12 @@ if __name__ == "__main__":
 
     #glc.printar()
 
-    gr = Leitor('./testes/gramaticas/gr.txt').ler()
+    er = Leitor('./testes/expressoes/er.txt').ler()
     #gr.printar()
-    print(gr.converterParaAutomato())
+    print(er.alfabeto)
+    print(er.expressao)
+    print("oi")
+
+    er.converterParaAFD()
     
 

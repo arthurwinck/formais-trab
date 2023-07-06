@@ -1,0 +1,5 @@
+<ER>
+<alfabeto>
+a b
+<expressao>
+a(a + b)∗b
