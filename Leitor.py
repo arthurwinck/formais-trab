@@ -167,8 +167,18 @@ class Leitor:
         with open("arquivos\\automatos\\automato.txt", "w") as file:
             file.write(arquivo)
 
-if __name__ == "__main__":
+    def exportarExpressaoRegular(self, elemento: Elemento):
+        arquivo = ""
+        arquivo += "<ER> \n"
+        arquivo += "<alfabeto> \n"
+        separador = ' '
+        arquivo += f"{separador.join(str(elemento.alfabeto))} \n"
+        arquivo += "<expressao> \n"
+        arquivo += f"{elemento.expressao}"
+        print(arquivo)
 
+if __name__ == "__main__":
+    '''
     # AF -----------------------------
     # leitorAFND = Leitor("./arquivos/automatos/afnd2.txt")
     # afnd = leitorAFND.ler()
@@ -195,3 +205,9 @@ if __name__ == "__main__":
     print(glc.producoes)
 
     #glc.printar()
+    '''
+
+    # Expressao -----------------------------
+    leitorExpressao = Leitor("./testes/expressoes_regulares/expressao_regular.txt")
+    expressao = leitorExpressao.ler()
+    leitorExpressao.exportarExpressaoRegular(expressao)
